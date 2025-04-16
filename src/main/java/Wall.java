@@ -21,7 +21,7 @@ public class Wall {
 
     // Dibujar la pared (gris por ahora)
     public void draw(Graphics2D g) {
-        g.setColor(Color.GRAY);
+        g.setColor(Color.BLACK);
         g.fillRect((int)x, (int)y, width, height);
     }
 }

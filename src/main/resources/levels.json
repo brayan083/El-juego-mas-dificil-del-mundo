@@ -1,154 +1,244 @@
 {
   "levels": [
-      {
-          "player": {
-              "x": 50,
-              "y": 50,
-              "size": 20,
-              "speed": 2
-          },
-          "goal": {
-              "x": 500,
-              "y": 300,
-              "width": 40,
-              "height": 40
-          },
-          "obstacles": [
-              {
-                  "x": 200,
-                  "y": 200,
-                  "radius": 15,
-                  "speed": 2,
-                  "horizontal": true
-              }
-          ],
-          "walls": [
-              {
-                  "x": 0,
-                  "y": 0,
-                  "width": 600,
-                  "height": 20
-              },
-              {
-                  "x": 0,
-                  "y": 380,
-                  "width": 600,
-                  "height": 20
-              }
-          ]
+    {
+      "player": {
+        "x": 120,
+        "y": 180,
+        "size": 18,
+        "speed": 1
       },
-      {
-          "player": {
-              "x": 30,
-              "y": 30,
-              "size": 20,
-              "speed": 2.5
-          },
-          "goal": {
-              "x": 550,
-              "y": 350,
-              "width": 40,
-              "height": 40
-          },
-          "obstacles": [
-              {
-                  "x": 200,
-                  "y": 150,
-                  "radius": 15,
-                  "speed": 3,
-                  "horizontal": true
-              },
-              {
-                  "x": 300,
-                  "y": 250,
-                  "radius": 15,
-                  "speed": 2.5,
-                  "horizontal": false
-              }
-          ],
-          "walls": [
-              {
-                  "x": 0,
-                  "y": 0,
-                  "width": 600,
-                  "height": 20
-              },
-              {
-                  "x": 0,
-                  "y": 380,
-                  "width": 600,
-                  "height": 20
-              },
-              {
-                  "x": 250,
-                  "y": 100,
-                  "width": 20,
-                  "height": 200
-              }
-          ]
+      "goal": {
+        "x": 400,
+        "y": 150,
+        "width": 50,
+        "height": 100
       },
-      {
-          "player": {
-              "x": 20,
-              "y": 20,
-              "size": 20,
-              "speed": 3
-          },
-          "goal": {
-              "x": 540,
-              "y": 340,
-              "width": 40,
-              "height": 40
-          },
-          "obstacles": [
-              {
-                  "x": 150,
-                  "y": 150,
-                  "radius": 15,
-                  "speed": 3.5,
-                  "horizontal": true
-              },
-              {
-                  "x": 300,
-                  "y": 200,
-                  "radius": 15,
-                  "speed": 3,
-                  "horizontal": false
-              },
-              {
-                  "x": 450,
-                  "y": 250,
-                  "radius": 15,
-                  "speed": 4,
-                  "horizontal": true
-              }
-          ],
-          "walls": [
-              {
-                  "x": 0,
-                  "y": 0,
-                  "width": 600,
-                  "height": 20
-              },
-              {
-                  "x": 0,
-                  "y": 380,
-                  "width": 600,
-                  "height": 20
-              },
-              {
-                  "x": 150,
-                  "y": 100,
-                  "width": 20,
-                  "height": 150
-              },
-              {
-                  "x": 400,
-                  "y": 150,
-                  "width": 20,
-                  "height": 150
-              }
-          ]
-      }
+      "obstacles": [
+        {
+          "x": 213,
+          "y": 20,
+          "radius": 9,
+          "speed": 3,
+          "horizontal": false
+        },{
+          "x": 237,
+          "y": 20,
+          "radius": 9,
+          "speed": 3,
+          "horizontal": false
+        },{
+          "x": 262,
+          "y": 380,
+          "radius": 9,
+          "speed": 3,
+          "horizontal": false
+        },{
+          "x": 287,
+          "y": 380,
+          "radius": 9,
+          "speed": 3,
+          "horizontal": false
+        },{
+          "x": 313,
+          "y": 20,
+          "radius": 9,
+          "speed": 3,
+          "horizontal": false
+        },{
+          "x": 337,
+          "y": 20,
+          "radius": 9,
+          "speed": 3,
+          "horizontal": false
+        }
+      ],
+      "walls": [
+        {
+          "x": 95,
+          "y": 150,
+          "width": 5,
+          "height": 100
+        },
+        {
+          "x": 95,
+          "y": 145,
+          "width": 105,
+          "height": 5
+        },
+        {
+          "x": 95,
+          "y": 250,
+          "width": 105,
+          "height": 5
+        },
+        {
+          "x": 195,
+          "y": 125,
+          "width": 5,
+          "height": 20
+        },
+        {
+          "x": 195,
+          "y": 255,
+          "width": 5,
+          "height": 20
+        },
+        {
+          "x": 195,
+          "y": 120,
+          "width": 160,
+          "height": 5
+        },
+        {
+          "x": 195,
+          "y": 275,
+          "width": 160,
+          "height": 5
+        },
+        {
+          "x": 350,
+          "y": 255,
+          "width": 5,
+          "height": 20
+        },
+        {
+          "x": 350,
+          "y": 125,
+          "width": 5,
+          "height": 20
+        },
+        {
+          "x": 350,
+          "y": 145,
+          "width": 105,
+          "height": 5
+        },
+        {
+          "x": 350,
+          "y": 250,
+          "width": 105,
+          "height": 5
+        },
+        {
+          "x": 450,
+          "y": 150,
+          "width": 5,
+          "height": 100
+        }
+      ]
+    },
+    {
+      "player": {
+        "x": 30,
+        "y": 30,
+        "size": 20,
+        "speed": 2.5
+      },
+      "goal": {
+        "x": 500,
+        "y": 350,
+        "width": 40,
+        "height": 40
+      },
+      "obstacles": [
+        {
+          "x": 200,
+          "y": 150,
+          "radius": 15,
+          "speed": 3,
+          "horizontal": true
+        },
+        {
+          "x": 300,
+          "y": 250,
+          "radius": 15,
+          "speed": 2.5,
+          "horizontal": false
+        }
+      ],
+      "walls": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 600,
+          "height": 20
+        },
+        {
+          "x": 0,
+          "y": 380,
+          "width": 600,
+          "height": 20
+        },
+        {
+          "x": 250,
+          "y": 100,
+          "width": 20,
+          "height": 200
+        }
+      ]
+    },
+    {
+      "player": {
+        "x": 20,
+        "y": 20,
+        "size": 20,
+        "speed": 3
+      },
+      "goal": {
+        "x": 540,
+        "y": 340,
+        "width": 40,
+        "height": 40
+      },
+      "obstacles": [
+        {
+          "x": 150,
+          "y": 150,
+          "radius": 15,
+          "speed": 3.5,
+          "horizontal": true
+        },
+        {
+          "x": 300,
+          "y": 200,
+          "radius": 15,
+          "speed": 3,
+          "horizontal": false
+        },
+        {
+          "x": 450,
+          "y": 250,
+          "radius": 15,
+          "speed": 4,
+          "horizontal": true
+        }
+      ],
+      "walls": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 600,
+          "height": 20
+        },
+        {
+          "x": 0,
+          "y": 380,
+          "width": 600,
+          "height": 20
+        },
+        {
+          "x": 150,
+          "y": 100,
+          "width": 20,
+          "height": 150
+        },
+        {
+          "x": 400,
+          "y": 150,
+          "width": 20,
+          "height": 150
+        }
+      ]
+    }
   ]
 }

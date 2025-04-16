@@ -17,9 +17,13 @@ public class Level {
 
     // Actualizar elementos móviles
     public void update() {
+        // Actualizar obstáculos
         for (Obstacle obstacle : obstacles) {
             obstacle.update();
         }
+        
+        // Actualizar jugador con las paredes
+        player.update(windowWidth, windowHeight, walls);
     }
 
     // Dibujar todo

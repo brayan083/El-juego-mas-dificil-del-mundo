@@ -83,7 +83,7 @@ public class Game extends JPanel {
     public void update() {
         if (!gameOver) {
             level.update(); // Actualiza obstáculos
-            level.getPlayer().update(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT); // Actualiza jugador
+            level.getPlayer().update(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT, level.getWalls()); // Actualiza jugador
             checkCollisions();
         }
     }
@@ -94,27 +94,16 @@ public class Game extends JPanel {
         // Verificar colisiones con obstáculos
         for (Obstacle obstacle : level.getObstacles()) {
             if (player.getBounds().intersects(obstacle.getBounds().getBounds())) {
-                resetPlayerPosition(); // En lugar de gameOver = true
+                resetPlayerPosition();
                 return;
             }
         }
 
         // Verificar si llegó a la meta
         if (player.getBounds().intersects(level.getGoal().getBounds())) {
-            if (gameOver) {
-                return; // Si ya está en gameOver, no hacer nada
-            } else {
-                // Cargar el siguiente nivel
+            if (!gameOver) {
                 currentLevel++;
                 loadLevel(currentLevel);
-            }
-            return;
-        }
-
-        // Verificar colisiones con paredes
-        for (Wall wall : level.getWalls()) {
-            if (player.getBounds().intersects(wall.getBounds())) {
-                // Manejar colisión con pared
             }
         }
     }
@@ -135,6 +124,23 @@ public class Game extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+
+        // Dibujar el tablero de ajedrez
+        int tileSize = 25; // Tamaño de cada cuadrado
+        boolean isWhite = true;
+
+        for (int y = 0; y < Config.WINDOW_HEIGHT; y += tileSize) {
+            for (int x = 0; x < Config.WINDOW_WIDTH; x += tileSize) {
+                if (isWhite) {
+                    g2d.setColor(new Color(240, 240, 240)); // Gris muy claro
+                } else {
+                    g2d.setColor(new Color(220, 220, 220)); // Gris claro
+                }
+                g2d.fillRect(x, y, tileSize, tileSize);
+                isWhite = !isWhite;
+            }
+            isWhite = !isWhite; // Cambiar el patrón en cada fila
+        }
 
         // Solo dibujamos el nivel si existe y no estamos en gameOver
         if (level != null && !gameOver) {
