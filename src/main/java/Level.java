@@ -19,7 +19,7 @@ public class Level {
     public void update() {
         // Actualizar obstáculos
         for (Obstacle obstacle : obstacles) {
-            obstacle.update();
+            obstacle.update(walls);
         }
         
         // Actualizar jugador con las paredes

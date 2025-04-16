@@ -16,39 +16,39 @@
       "obstacles": [
         {
           "x": 213,
-          "y": 20,
+          "y": 135,
           "radius": 9,
-          "speed": 3,
+          "speed": 2.5,
           "horizontal": false
         },{
           "x": 237,
-          "y": 20,
+          "y": 135,
           "radius": 9,
-          "speed": 3,
+          "speed": 2.5,
           "horizontal": false
         },{
           "x": 262,
-          "y": 380,
+          "y": 265,
           "radius": 9,
-          "speed": 3,
+          "speed": 2.5,
           "horizontal": false
         },{
           "x": 287,
-          "y": 380,
+          "y": 265,
           "radius": 9,
-          "speed": 3,
+          "speed": 2.5,
           "horizontal": false
         },{
           "x": 313,
-          "y": 20,
+          "y": 135,
           "radius": 9,
-          "speed": 3,
+          "speed": 2.5,
           "horizontal": false
         },{
           "x": 337,
-          "y": 20,
+          "y": 135,
           "radius": 9,
-          "speed": 3,
+          "speed": 2.5,
           "horizontal": false
         }
       ],
