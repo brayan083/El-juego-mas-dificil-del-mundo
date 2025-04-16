@@ -2,50 +2,50 @@
   "levels": [
     {
       "player": {
-        "x": 120,
+        "x": 325,
         "y": 180,
         "size": 18,
         "speed": 1
       },
       "goal": {
-        "x": 400,
+        "x": 600,
         "y": 150,
         "width": 50,
         "height": 100
       },
       "obstacles": [
         {
-          "x": 213,
+          "x": 413,
           "y": 135,
           "radius": 9,
           "speed": 2.5,
           "horizontal": false
         },{
-          "x": 237,
+          "x": 437,
           "y": 135,
           "radius": 9,
           "speed": 2.5,
           "horizontal": false
         },{
-          "x": 262,
+          "x": 462,
           "y": 265,
           "radius": 9,
           "speed": 2.5,
           "horizontal": false
         },{
-          "x": 287,
+          "x": 487,
           "y": 265,
           "radius": 9,
           "speed": 2.5,
           "horizontal": false
         },{
-          "x": 313,
+          "x": 513,
           "y": 135,
           "radius": 9,
           "speed": 2.5,
           "horizontal": false
         },{
-          "x": 337,
+          "x": 537,
           "y": 135,
           "radius": 9,
           "speed": 2.5,
@@ -54,73 +54,73 @@
       ],
       "walls": [
         {
-          "x": 95,
+          "x": 295,
           "y": 150,
           "width": 5,
           "height": 100
         },
         {
-          "x": 95,
+          "x": 295,
           "y": 145,
           "width": 105,
           "height": 5
         },
         {
-          "x": 95,
+          "x": 295,
           "y": 250,
           "width": 105,
           "height": 5
         },
         {
-          "x": 195,
+          "x": 395,
           "y": 125,
           "width": 5,
           "height": 20
         },
         {
-          "x": 195,
+          "x": 395,
           "y": 255,
           "width": 5,
           "height": 20
         },
         {
-          "x": 195,
+          "x": 395,
           "y": 120,
           "width": 160,
           "height": 5
         },
         {
-          "x": 195,
+          "x": 395,
           "y": 275,
           "width": 160,
           "height": 5
         },
         {
-          "x": 350,
+          "x": 550,
           "y": 255,
           "width": 5,
           "height": 20
         },
         {
-          "x": 350,
+          "x": 550,
           "y": 125,
           "width": 5,
           "height": 20
         },
         {
-          "x": 350,
+          "x": 550,
           "y": 145,
           "width": 105,
           "height": 5
         },
         {
-          "x": 350,
+          "x": 550,
           "y": 250,
           "width": 105,
           "height": 5
         },
         {
-          "x": 450,
+          "x": 650,
           "y": 150,
           "width": 5,
           "height": 100
