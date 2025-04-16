@@ -1,0 +1,9 @@
+<archetype>
+  <id>El_juego_mas_dificil_del_mundo</id>
+  <sources>
+    <source>src/main/java/App.java</source>
+  </sources>
+  <testSources>
+    <source>src/test/java/AppTest.java</source>
+  </testSources>
+</archetype>
