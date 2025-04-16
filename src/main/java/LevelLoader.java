@@ -81,4 +81,17 @@ public class LevelLoader {
             return null;
         }
     }
+
+    public static int getTotalLevels() {
+        try {
+            if (rootNode == null) {
+            InputStream is = LevelLoader.class.getResourceAsStream("/levels.json");
+            rootNode = mapper.readTree(is);
+            }
+            return rootNode.get("levels").size();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 }

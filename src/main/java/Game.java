@@ -10,6 +10,7 @@ public class Game extends JPanel {
     private Level level;
     private boolean gameOver;
     private int currentLevel = 0;
+    private int deathCount = 0; // Contador de muertes
 
     public Game() {
         // level = new Level(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT);
@@ -109,6 +110,7 @@ public class Game extends JPanel {
     }
 
     private void resetPlayerPosition() {
+        deathCount++; // Incrementar contador de muertes
         Player player = level.getPlayer();
         // Obtener la posición inicial del jugador desde el nivel actual
         JsonNode levelData = LevelLoader.getLevelData(currentLevel);
@@ -125,6 +127,24 @@ public class Game extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
+        // Dibujar el header
+        g2d.setColor(new Color(50, 50, 50));
+        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, 30);
+
+        // Texto del header
+        g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.BOLD, 16));
+        int totalLevels = LevelLoader.getTotalLevels(); // Obtener el total de niveles
+        g2d.drawString("Nivel: " + (currentLevel + 1) + "/" + totalLevels, 20, 22);
+        g2d.drawString("Muertes: " + deathCount, Config.WINDOW_WIDTH - 150, 22);
+
+        drawGame(g2d);
+    }
+
+    private void drawGame(Graphics2D g2d) {
+        // Mover todo el contenido del juego 30 píxeles hacia abajo
+        g2d.translate(0, 30);
+        
         // Dibujar el tablero de ajedrez
         int tileSize = 25; // Tamaño de cada cuadrado
         boolean isWhite = true;
@@ -155,7 +175,14 @@ public class Game extends JPanel {
             // Mensaje de victoria
             g2d.setColor(Color.GREEN);
             g2d.setFont(new Font("Arial", Font.BOLD, 30));
-            g2d.drawString("¡Juego Completado!", 180, 200);
+            String message = "¡Juego Completado!";
+            FontMetrics metrics = g2d.getFontMetrics();
+            int x = (getWidth() - metrics.stringWidth(message)) / 2;
+            int y = (getHeight() - metrics.getHeight()) / 2 + metrics.getAscent();
+            g2d.drawString(message, x, y);
         }
+        
+        // Restaurar la transformación
+        g2d.translate(0, -30);
     }
 }
