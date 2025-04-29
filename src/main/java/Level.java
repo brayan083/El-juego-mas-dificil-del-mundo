@@ -1,35 +1,44 @@
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.Graphics2D;
 
 public class Level {
     private Player player; // Jugador
     private ArrayList<Obstacle> obstacles; // Lista de obstáculos
     private Goal goal; // Meta
-    private ArrayList<Wall> walls; // Lista de paredes
+    private int[][] tileMap; // Cuadrícula del mapa
+    private int tileSize; // Tamaño de cada celda
     private int windowWidth, windowHeight; // Límites de la ventana
 
     // Constructor
     public Level(int windowWidth, int windowHeight) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
+        this.obstacles = new ArrayList<>();
     }
 
     // Actualizar elementos móviles
     public void update() {
         // Actualizar obstáculos
         for (Obstacle obstacle : obstacles) {
-            obstacle.update(walls);
+            obstacle.update(tileMap, tileSize);
         }
-        
+
         // Actualizar jugador con las paredes
-        player.update(windowWidth, windowHeight, walls);
+        player.update(windowWidth, windowHeight, tileMap, tileSize);
     }
 
     // Dibujar todo
     public void draw(Graphics2D g) {
-        for (Wall wall : walls) {
-            wall.draw(g);
+        if (tileMap != null) {
+            for (int i = 0; i < tileMap.length; i++) {
+                for (int j = 0; j < tileMap[i].length; j++) {
+                    if (tileMap[i][j] == 1) {
+                        g.setColor(new Color(179, 179, 255));;
+                        g.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
+                    }
+                }
+            }
         }
         for (Obstacle obstacle : obstacles) {
             obstacle.draw(g);
@@ -51,8 +60,12 @@ public class Level {
         return goal;
     }
 
-    public ArrayList<Wall> getWalls() {
-        return walls;
+    public int[][] getTileMap() {
+        return tileMap;
+    }
+
+    public int getTileSize() {
+        return tileSize;
     }
 
     // Setters
@@ -68,7 +81,8 @@ public class Level {
         this.obstacles = new ArrayList<>(obstacles);
     }
 
-    public void setWalls(List<Wall> walls) {
-        this.walls = new ArrayList<>(walls);
+    public void setTileMap(int[][] tileMap, int tileSize) {
+        this.tileMap = tileMap;
+        this.tileSize = tileSize;
     }
 }

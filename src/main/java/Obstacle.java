@@ -1,7 +1,5 @@
-import java.awt.Graphics2D;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
-import java.util.List;
 
 public class Obstacle {
     private float x, y; // Posición del centro del círculo
@@ -23,8 +21,7 @@ public class Obstacle {
     }
 
     // Actualizar posición con rebote
-    // Actualizar posición con rebote
-    public void update(List<Wall> walls) {
+    public void update(int[][] tileMap, int tileSize) {
         // Calcular nueva posición
         float newX = x + (isHorizontal ? speed : 0);
         float newY = y + (isHorizontal ? 0 : speed);
@@ -32,15 +29,16 @@ public class Obstacle {
         // Crear un área de prueba para la nueva posición
         Ellipse2D nextPos = new Ellipse2D.Float(newX - radius, newY - radius, radius * 2, radius * 2);
 
-        // Verificar colisión con paredes
-        boolean collision = false;
-        for (Wall wall : walls) {
-            if (nextPos.intersects(wall.getBounds())) {
-                collision = true;
-                break;
-            }
-        }
+        // Convertir Rectangle2D a Rectangle
+        Rectangle bounds = new Rectangle(
+                (int) nextPos.getX(),
+                (int) nextPos.getY(),
+                (int) nextPos.getWidth(),
+                (int) nextPos.getHeight()
+        );
 
+        // Verificar colisión con paredes
+        boolean collision = collidesWithTileMap(bounds, tileMap, tileSize);
         if (isHorizontal) {
             // Verificar colisión con bordes de la ventana o paredes
             if (newX - radius <= 0 || newX + radius >= windowWidth || collision) {
@@ -51,22 +49,7 @@ public class Obstacle {
                 } else if (newX + radius >= windowWidth) {
                     newX = windowWidth - radius - 1.0f;
                 } else if (collision) {
-                    // Ajustar posición según la dirección anterior
-                    if (speed > 0) { // Iba hacia la izquierda, ahora va hacia la derecha
-                        for (Wall wall : walls) {
-                            if (nextPos.intersects(wall.getBounds())) {
-                                newX = wall.getBounds().x + wall.getBounds().width + radius + 1.0f;
-                                break;
-                            }
-                        }
-                    } else { // Iba hacia la derecha, ahora va hacia la izquierda
-                        for (Wall wall : walls) {
-                            if (nextPos.intersects(wall.getBounds())) {
-                                newX = wall.getBounds().x - radius - 1.0f;
-                                break;
-                            }
-                        }
-                    }
+                    newX = x; // Revertir movimiento
                 }
             }
         } else {
@@ -79,41 +62,35 @@ public class Obstacle {
                 } else if (newY + radius >= windowHeight) {
                     newY = windowHeight - radius - 1.0f;
                 } else if (collision) {
-                    // Ajustar posición según la dirección anterior
-                    if (speed > 0) { // Iba hacia arriba, ahora va hacia abajo
-                        for (Wall wall : walls) {
-                            if (nextPos.intersects(wall.getBounds())) {
-                                newY = wall.getBounds().y + wall.getBounds().height + radius + 1.0f;
-                                break;
-                            }
-                        }
-                    } else { // Iba hacia abajo, ahora va hacia arriba
-                        for (Wall wall : walls) {
-                            if (nextPos.intersects(wall.getBounds())) {
-                                newY = wall.getBounds().y - radius - 1.0f;
-                                break;
-                            }
-                        }
-                    }
+                    newY = y; // Revertir movimiento
                 }
             }
         }
 
-        // Verificar si la nueva posición es válida (no colisiona)
-        nextPos.setFrame(newX - radius, newY - radius, radius * 2, radius * 2);
-        boolean validPosition = true;
-        for (Wall wall : walls) {
-            if (nextPos.intersects(wall.getBounds())) {
-                validPosition = false;
-                break;
+        // Actualizar posición
+        x = newX;
+        y = newY;
+    }
+
+    private boolean collidesWithTileMap(Rectangle bounds, int[][] tileMap, int tileSize) {
+        if (tileMap == null) return false;
+
+        int minRow = Math.max(0, bounds.y / tileSize);
+        int maxRow = Math.min(tileMap.length - 1, (bounds.y + bounds.height - 1) / tileSize);
+        int minCol = Math.max(0, bounds.x / tileSize);
+        int maxCol = Math.min(tileMap[0].length - 1, (bounds.x + bounds.width - 1) / tileSize);
+
+        for (int i = minRow; i <= maxRow; i++) {
+            for (int j = minCol; j <= maxCol; j++) {
+                if (tileMap[i][j] == 1) {
+                    Rectangle tileRect = new Rectangle(j * tileSize, i * tileSize, tileSize, tileSize);
+                    if (bounds.intersects(tileRect)) {
+                        return true;
+                    }
+                }
             }
         }
-
-        // Aplicar la nueva posición solo si es válida
-        if (validPosition) {
-            x = newX;
-            y = newY;
-        }
+        return false;
     }
 
     // Obtener área para colisiones
