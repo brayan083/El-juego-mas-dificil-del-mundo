@@ -1,10 +1,15 @@
 {
   "levels": [
     {
-      "player": { "x": 100, "y": 100, "size": 20, "speed": 5 },
-      "goal": { "x": 600, "y": 100, "width": 50, "height": 50 },
+      "player": { "x": 240, "y": 270, "size": 20, "speed": 5 },
+      "goal": { "x": 780, "y": 210, "width": 60, "height": 150 },
       "obstacles": [
-        { "x": 300, "y": 300, "radius": 15, "speed": 3, "horizontal": true }
+        { "x": 420, "y": 190, "radius": 10, "speed": 3, "horizontal": false },
+        { "x": 450, "y": 190, "radius": 10, "speed": 3, "horizontal": false },
+        { "x": 495, "y": 360, "radius": 10, "speed": 3, "horizontal": false },
+        { "x": 525, "y": 360, "radius": 10, "speed": 3, "horizontal": false },
+        { "x": 570, "y": 190, "radius": 10, "speed": 3, "horizontal": false },
+        { "x": 600, "y": 190, "radius": 10, "speed": 3, "horizontal": false }
       ],
       "tileMap": [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],

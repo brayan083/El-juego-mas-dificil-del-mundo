@@ -21,7 +21,7 @@ public class Goal {
 
     // Dibujar la meta verde
     public void draw(Graphics2D g) {
-        g.setColor(Color.GREEN);
+        g.setColor(new Color(165,255, 163));
         g.fillRect((int)x, (int)y, width, height);
     }
 }
