@@ -6,13 +6,29 @@ import java.util.List;
 
 public class LevelLoader {
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static JsonNode rootNode; // Agregamos esta variable para cachear el JSON
+    private static JsonNode rootNode = null; // Para cachear el JSON
 
+    // Metodo privado para inicializar y obtener rootNode
+    private static JsonNode getRootNode() {
+        if (rootNode == null) {
+            try {
+                InputStream is = LevelLoader.class.getResourceAsStream("/levels.json");
+                rootNode = mapper.readTree(is);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.println("Error fatal: No se pudo cargar el archivo de niveles");
+            }
+        }
+        return rootNode;
+    }
 
     public static Level loadLevel(int levelIndex) {
         try {
-            InputStream is = LevelLoader.class.getResourceAsStream("/levels.json");
-            JsonNode root = mapper.readTree(is);
+            JsonNode root = getRootNode();
+            if (root == null || levelIndex >= root.get("levels").size() || levelIndex < 0) {
+                return null; // Devolver null si el índice no es válido
+            }
+
             JsonNode levelNode = root.get("levels").get(levelIndex);
 
             // Crear nivel con dimensiones de ventana
@@ -50,16 +66,20 @@ public class LevelLoader {
             }
             level.setObstacles(obstacles);
 
-            // Cargar paredes
-            List<Wall> walls = new ArrayList<>();
-            for (JsonNode wallNode : levelNode.get("walls")) {
-                walls.add(new Wall(
-                        wallNode.get("x").floatValue(),
-                        wallNode.get("y").floatValue(),
-                        wallNode.get("width").intValue(),
-                        wallNode.get("height").intValue()));
+            // Cargar tileMap
+            JsonNode tileMapNode = levelNode.get("tileMap");
+            if (tileMapNode != null) {
+                int rows = tileMapNode.size();
+                int cols = tileMapNode.get(0).size();
+                int[][] tileMap = new int[rows][cols];
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < cols; j++) {
+                        tileMap[i][j] = tileMapNode.get(i).get(j).intValue();
+                    }
+                }
+                int tileSize = levelNode.get("tileSize").intValue();
+                level.setTileMap(tileMap, tileSize);
             }
-            level.setWalls(walls);
 
             return level;
         } catch (Exception e) {

@@ -1,7 +1,6 @@
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.util.List;
 
 public class Player {
     private float x, y; // Posición del cuadrado
@@ -18,7 +17,7 @@ public class Player {
     }
 
     // Actualizar posición según estado de teclas
-    public void update(int windowWidth, int windowHeight, List<Wall> walls) {
+    public void update(int windowWidth, int windowHeight, int[][] tileMap, int tileSize) {
         // Calculamos la nueva posición
         float newX = x;
         float newY = y;
@@ -26,56 +25,28 @@ public class Player {
         // Movimientos individuales con la misma velocidad
         if (movingUp) {
             Rectangle checkY = new Rectangle((int)x, (int)(y - speed), size, size);
-            boolean canMoveY = true;
-            for (Wall wall : walls) {
-                if (checkY.intersects(wall.getBounds())) {
-                    canMoveY = false;
-                    break;
-                }
-            }
-            if (canMoveY) {
+            if (!collidesWithTileMap(checkY, tileMap, tileSize)) {
                 newY -= speed;
             }
         }
         
         if (movingDown) {
             Rectangle checkY = new Rectangle((int)x, (int)(y + speed), size, size);
-            boolean canMoveY = true;
-            for (Wall wall : walls) {
-                if (checkY.intersects(wall.getBounds())) {
-                    canMoveY = false;
-                    break;
-                }
-            }
-            if (canMoveY) {
+            if (!collidesWithTileMap(checkY, tileMap, tileSize)) {
                 newY += speed;
             }
         }
         
         if (movingLeft) {
             Rectangle checkX = new Rectangle((int)(x - speed), (int)y, size, size);
-            boolean canMoveX = true;
-            for (Wall wall : walls) {
-                if (checkX.intersects(wall.getBounds())) {
-                    canMoveX = false;
-                    break;
-                }
-            }
-            if (canMoveX) {
+            if (!collidesWithTileMap(checkX, tileMap, tileSize)) {
                 newX -= speed;
             }
         }
         
         if (movingRight) {
             Rectangle checkX = new Rectangle((int)(x + speed), (int)y, size, size);
-            boolean canMoveX = true;
-            for (Wall wall : walls) {
-                if (checkX.intersects(wall.getBounds())) {
-                    canMoveX = false;
-                    break;
-                }
-            }
-            if (canMoveX) {
+            if (!collidesWithTileMap(checkX, tileMap, tileSize)) {
                 newX += speed;
             }
         }
@@ -83,6 +54,27 @@ public class Player {
         // Aplicar límites de la ventana
         x = Math.max(0, Math.min(newX, windowWidth - size));
         y = Math.max(0, Math.min(newY, windowHeight - size));
+    }
+
+    private boolean collidesWithTileMap(Rectangle bounds, int[][] tileMap, int tileSize) {
+        if (tileMap == null) return false;
+
+        int minRow = Math.max(0, bounds.y / tileSize);
+        int maxRow = Math.min(tileMap.length - 1, (bounds.y + bounds.height - 1) / tileSize);
+        int minCol = Math.max(0, bounds.x / tileSize);
+        int maxCol = Math.min(tileMap[0].length - 1, (bounds.x + bounds.width - 1) / tileSize);
+
+        for (int i = minRow; i <= maxRow; i++) {
+            for (int j = minCol; j <= maxCol; j++) {
+                if (tileMap[i][j] == 1) {
+                    Rectangle tileRect = new Rectangle(j * tileSize, i * tileSize, tileSize, tileSize);
+                    if (bounds.intersects(tileRect)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     // Métodos para cambiar el estado de movimiento

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Area;
 
 public class Game extends JPanel {
     private Level level;
@@ -83,8 +84,7 @@ public class Game extends JPanel {
 
     public void update() {
         if (!gameOver) {
-            level.update(); // Actualiza obstáculos
-            level.getPlayer().update(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT, level.getWalls()); // Actualiza jugador
+            level.update();
             checkCollisions();
         }
     }
@@ -128,12 +128,12 @@ public class Game extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         // Dibujar el header
-        g2d.setColor(new Color(50, 50, 50));
-        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, 30);
+        g2d.setColor(new Color(0, 0, 0));
+        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, 40);
 
         // Texto del header
         g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 16));
+        g2d.setFont(new Font("Monospaced", Font.BOLD, 18));
         int totalLevels = LevelLoader.getTotalLevels(); // Obtener el total de niveles
         g2d.drawString("Nivel: " + (currentLevel + 1) + "/" + totalLevels, 20, 22);
         g2d.drawString("Muertes: " + deathCount, Config.WINDOW_WIDTH - 150, 22);
@@ -142,24 +142,35 @@ public class Game extends JPanel {
     }
 
     private void drawGame(Graphics2D g2d) {
-        // Mover todo el contenido del juego 30 píxeles hacia abajo
-        g2d.translate(0, 30);
-        
-        // Dibujar el tablero de ajedrez
-        int tileSize = 25; // Tamaño de cada cuadrado
-        boolean isWhite = true;
+        // Mover el área de juego hacia abajo
+        g2d.translate(0, 40);
 
-        for (int y = 0; y < Config.WINDOW_HEIGHT; y += tileSize) {
-            for (int x = 0; x < Config.WINDOW_WIDTH; x += tileSize) {
-                if (isWhite) {
-                    g2d.setColor(new Color(240, 240, 240)); // Gris muy claro
-                } else {
-                    g2d.setColor(new Color(220, 220, 220)); // Gris claro
+        // Pintar toda el área externa de color lavanda
+        g2d.setColor(new Color(179, 179, 255)); // Color lavanda para el área externa
+        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - 40);
+
+        // Calcular el área jugable (rectángulo que encierra las paredes)
+        Shape playArea = calculatePlayArea();
+        if (playArea != null) {
+            Shape originalClip = g2d.getClip();
+            g2d.setClip(playArea);
+
+            // Dibujar el tablero de ajedrez
+            int tileSize = 30; // Tamaño de cada cuadrado
+            boolean isWhite = true;
+            for (int y = 0; y < Config.WINDOW_HEIGHT - 40; y += tileSize) {
+                for (int x = 0; x < Config.WINDOW_WIDTH; x += tileSize) {
+                    if (isWhite) {
+                        g2d.setColor(new Color(222, 222, 255)); // Lavanda muy claro
+                    } else {
+                        g2d.setColor(new Color(247, 247, 255)); // Gris claro
+                    }
+                    g2d.fillRect(x, y, tileSize, tileSize);
+                    isWhite = !isWhite;
                 }
-                g2d.fillRect(x, y, tileSize, tileSize);
-                isWhite = !isWhite;
+                isWhite = !isWhite; // Cambiar el patrón en cada fila
             }
-            isWhite = !isWhite; // Cambiar el patrón en cada fila
+            g2d.setClip(originalClip);
         }
 
         // Solo dibujamos el nivel si existe y no estamos en gameOver
@@ -184,5 +195,25 @@ public class Game extends JPanel {
         
         // Restaurar la transformación
         g2d.translate(0, -30);
+    }
+
+    private Shape calculatePlayArea() {
+        if (level == null || level.getTileMap() == null) {
+            System.out.println("No hay tileMap, usando área por defecto: (0, 0, " + Config.WINDOW_WIDTH + ", " + (Config.WINDOW_HEIGHT - 30) + ")");
+            return new Rectangle(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - 30);
+        }
+
+        int[][] tileMap = level.getTileMap();
+        int tileSize = level.getTileSize();
+        Area playArea = new Area();
+
+        for (int i = 0; i < tileMap.length; i++) {
+            for (int j = 0; j < tileMap[i].length; j++) {
+                if (tileMap[i][j] == 0) { // Piso
+                    playArea.add(new Area(new Rectangle(j * tileSize, i * tileSize, tileSize, tileSize)));
+                }
+            }
+        }
+        return playArea;
     }
 }
