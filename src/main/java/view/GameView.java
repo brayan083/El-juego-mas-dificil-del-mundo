@@ -14,6 +14,7 @@ import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Area;
 import java.util.ArrayList;
+import model.Coin;
 
 public class GameView {
 
@@ -65,10 +66,21 @@ public class GameView {
 
         g2d.setColor(Config.COLOR_HEADER_TEXT);
         g2d.setFont(new Font("Monospaced", Font.BOLD, 18));
-        g2d.drawString("Nivel: " + (gameController.getCurrentLevelIndex() + 1) + "/" + totalLevels, 20,
-                Config.HEADER_HEIGHT / 2 + 5); // Ajustar Y para centrar
-        g2d.drawString("Muertes: " + gameController.getDeathCount(), Config.WINDOW_WIDTH - 150, Config.HEADER_HEIGHT / 2 + 5); // Ajustar
-                                                                                                                        // Y
+        String levelText = "Nivel: " + (gameController.getCurrentLevelIndex() + 1) + "/" + totalLevels;
+        g2d.drawString(levelText, 20, Config.HEADER_HEIGHT / 2 + 5);
+
+        String deathsText = "Muertes: " + gameController.getDeathCount();
+        FontMetrics metrics = g2d.getFontMetrics(); // Para calcular el ancho del texto de muertes
+        int deathsTextWidth = metrics.stringWidth(deathsText);
+        g2d.drawString(deathsText, Config.WINDOW_WIDTH - deathsTextWidth - 20, Config.HEADER_HEIGHT / 2 + 5);
+
+
+        // Mostrar contador de monedas
+        String coinsText = "Monedas: " + gameController.getCoinsCollected();
+        // Posicionar el texto de monedas, por ejemplo, en el centro o al lado del nivel
+        int levelTextWidth = metrics.stringWidth(levelText);
+        g2d.drawString(coinsText, 20 + levelTextWidth + 50, Config.HEADER_HEIGHT / 2 + 5); // Ajusta el 50 según necesites
+
     }
 
     private Shape calculatePlayArea(Level level) {
@@ -144,6 +156,16 @@ public class GameView {
             }
         }
 
+        // Dibujar monedas 
+        ArrayList<Coin> coins = level.getCoins();
+        if (coins != null) {
+            for (Coin coin : coins) {
+                if (!coin.isCollected()) { // Solo dibujar si no ha sido recolectada
+                    drawCoin(g2d, coin);
+                }
+            }
+        }
+
         // Dibujar meta
         Goal goal = level.getGoal();
         if (goal != null) {
@@ -180,6 +202,20 @@ public class GameView {
         g2d.setColor(Config.COLOR_GOAL);
         Rectangle bounds = goal.getBounds(); // Asumiendo que Goal tiene getBounds()
         g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+    }
+
+    // Método para dibujar una moneda 
+    private void drawCoin(Graphics2D g2d, Coin coin) {
+        g2d.setColor(Config.COLOR_COIN);
+        g2d.fillOval(
+            (int)(coin.getX() - coin.getRadius()),
+            (int)(coin.getY() - coin.getRadius()),
+            coin.getRadius() * 2,
+            coin.getRadius() * 2
+        );
+        // Opcional: Dibujar un borde o un brillo
+        // g2d.setColor(Color.YELLOW.darker());
+        // g2d.drawOval(...);
     }
 
     public void drawGameOverScreen(Graphics2D g2d, String message) {

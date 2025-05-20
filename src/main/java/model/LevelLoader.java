@@ -67,6 +67,19 @@ public class LevelLoader {
             }
             level.setObstacles(obstacles);
 
+            // Cargar monedas 
+            List<Coin> coins = new ArrayList<>();
+            if (levelNode.has("coins")) { // Verificar si el array "coins" existe
+                for (JsonNode coinNode : levelNode.get("coins")) {
+                    coins.add(new Coin(
+                            coinNode.get("x").floatValue(),
+                            coinNode.get("y").floatValue(),
+                            coinNode.get("radius").intValue()
+                    ));
+                }
+            }
+            level.setCoins(coins);
+
             // Cargar tileMap
             JsonNode tileMapNode = levelNode.get("tileMap");
             if (tileMapNode != null) {

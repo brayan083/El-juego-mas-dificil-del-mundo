@@ -6,6 +6,8 @@ public class Config {
     public static final int WINDOW_WIDTH = 1000; //
     public static final int WINDOW_HEIGHT = 630; // 600 + 30 para el header
 
+    public static final Color COLOR_COIN = new Color(255, 215, 0); // Color dorado para las monedas
+
     // --- NUEVAS CONSTANTES DE COLOR ---
     // Colores de los elementos del juego
     public static final Color COLOR_PLAYER = Color.RED;

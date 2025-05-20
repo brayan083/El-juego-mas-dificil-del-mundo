@@ -6,6 +6,7 @@ public class Level {
     private Player player; // Jugador
     private ArrayList<Obstacle> obstacles; // Lista de obstáculos
     private Goal goal; // Meta
+    private ArrayList<Coin> coins;
     private int[][] tileMap; // Cuadrícula del mapa
     private int tileSize; // Tamaño de cada celda
     private int windowWidth, windowHeight; // Límites de la ventana
@@ -15,6 +16,7 @@ public class Level {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
         this.obstacles = new ArrayList<>();
+        this.coins = new ArrayList<>();
     }
 
     // Actualizar elementos móviles
@@ -25,7 +27,7 @@ public class Level {
             }
         }
         if (player != null) {
-            player.update(windowWidth, windowHeight - 40, tileMap, tileSize); // Ajustar windowHeight si el jugador no debe entrar al header
+            player.update(windowWidth, windowHeight - Config.HEADER_HEIGHT, tileMap, tileSize);
         }
     }
 
@@ -33,12 +35,14 @@ public class Level {
     public Player getPlayer() { return player; }
     public ArrayList<Obstacle> getObstacles() { return obstacles; }
     public Goal getGoal() { return goal; }
+    public ArrayList<Coin> getCoins() { return coins; }
     public int[][] getTileMap() { return tileMap; }
     public int getTileSize() { return tileSize; }
 
     // Setters 
     public void setPlayer(Player player) { this.player = player; }
     public void setGoal(Goal goal) { this.goal = goal; }
+    public void setCoins(List<Coin> coins) { this.coins = new ArrayList<>(coins); }
     public void setObstacles(List<Obstacle> obstacles) { this.obstacles = new ArrayList<>(obstacles); }
     public void setTileMap(int[][] tileMap, int tileSize) { this.tileMap = tileMap; this.tileSize = tileSize; }
 }

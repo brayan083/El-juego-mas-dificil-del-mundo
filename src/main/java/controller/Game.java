@@ -9,9 +9,11 @@ import model.Level;
 import model.LevelLoader;
 import model.Player;
 import view.GameView;
+import model.Coin;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 
 public class Game extends JPanel {
     private Level level;
@@ -19,6 +21,7 @@ public class Game extends JPanel {
     private int currentLevelIndex = 0;
     private int deathCount = 0; // Contador de muertes
     private int totalLevels = 0;
+    private int coinsCollected = 0;
 
     private InputHandler inputHandler; // Manejador de entrada
     private GameView gameView; // <-- NUEVA INSTANCIA
@@ -85,6 +88,7 @@ public class Game extends JPanel {
             return; // Chequeo de seguridad
 
         Player player = level.getPlayer();
+        Rectangle playerBounds = player.getBounds();
 
         // Verificar colisiones con obstáculos
         if (level.getObstacles() != null) {
@@ -92,6 +96,23 @@ public class Game extends JPanel {
                 if (player.getBounds().intersects(obstacle.getBounds().getBounds())) {
                     resetPlayerPosition();
                     return;
+                }
+            }
+        }
+
+        // Colisiones con monedas
+        if (level.getCoins() != null) {
+            for (Coin coin : level.getCoins()) {
+                if (!coin.isCollected()) { // Solo verificar si no ha sido recolectada
+                    Area playerArea = new Area(playerBounds);
+                    Area coinArea = new Area(coin.getBounds()); // Bounds de la moneda
+                    playerArea.intersect(coinArea);
+                    if (!playerArea.isEmpty()) {
+                        coin.setCollected(true); // Marcar como recolectada
+                        coinsCollected++; // Incrementar contador
+                        // Opcional: Añadir sonido o efecto aquí
+                        System.out.println("Monedas: " + coinsCollected); // Para depuración
+                    }
                 }
             }
         }
@@ -153,6 +174,10 @@ public class Game extends JPanel {
 
     public int getDeathCount() {
         return deathCount;
+    }
+
+    public int getCoinsCollected() {
+        return coinsCollected;
     }
 
     public boolean isGameOver() {
