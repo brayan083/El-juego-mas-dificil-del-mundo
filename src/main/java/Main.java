@@ -1,5 +1,8 @@
 import javax.swing.JFrame;
 
+import controller.Game;
+import model.Config;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Timer;

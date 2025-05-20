@@ -1,3 +1,5 @@
+package model;
+
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -14,6 +16,10 @@ public class Player {
         this.y = y;
         this.size = size;
         this.speed = speed;
+        this.movingUp = false;
+        this.movingDown = false;
+        this.movingLeft = false;
+        this.movingRight = false;
     }
 
     // Actualizar posición según estado de teclas
@@ -21,43 +27,44 @@ public class Player {
         // Calculamos la nueva posición
         float newX = x;
         float newY = y;
-        
+
         // Movimientos individuales con la misma velocidad
         if (movingUp) {
-            Rectangle checkY = new Rectangle((int)x, (int)(y - speed), size, size);
+            Rectangle checkY = new Rectangle((int) x, (int) (y - speed), size, size);
             if (!collidesWithTileMap(checkY, tileMap, tileSize)) {
                 newY -= speed;
             }
         }
-        
+
         if (movingDown) {
-            Rectangle checkY = new Rectangle((int)x, (int)(y + speed), size, size);
+            Rectangle checkY = new Rectangle((int) x, (int) (y + speed), size, size);
             if (!collidesWithTileMap(checkY, tileMap, tileSize)) {
                 newY += speed;
             }
         }
-        
+
         if (movingLeft) {
-            Rectangle checkX = new Rectangle((int)(x - speed), (int)y, size, size);
+            Rectangle checkX = new Rectangle((int) (x - speed), (int) y, size, size);
             if (!collidesWithTileMap(checkX, tileMap, tileSize)) {
                 newX -= speed;
             }
         }
-        
+
         if (movingRight) {
-            Rectangle checkX = new Rectangle((int)(x + speed), (int)y, size, size);
+            Rectangle checkX = new Rectangle((int) (x + speed), (int) y, size, size);
             if (!collidesWithTileMap(checkX, tileMap, tileSize)) {
                 newX += speed;
             }
         }
-        
+
         // Aplicar límites de la ventana
         x = Math.max(0, Math.min(newX, windowWidth - size));
         y = Math.max(0, Math.min(newY, windowHeight - size));
     }
 
     private boolean collidesWithTileMap(Rectangle bounds, int[][] tileMap, int tileSize) {
-        if (tileMap == null) return false;
+        if (tileMap == null)
+            return false;
 
         int minRow = Math.max(0, bounds.y / tileSize);
         int maxRow = Math.min(tileMap.length - 1, (bounds.y + bounds.height - 1) / tileSize);
@@ -99,17 +106,11 @@ public class Player {
         return new Rectangle((int) x, (int) y, size, size);
     }
 
-    // Dibujar el cuadrado rojo
-    public void draw(Graphics2D g) {
-        g.setColor(Color.RED);
-        g.fillRect((int) x, (int) y, size, size);
-    }
-
     // Getters y setters (por si necesitas ajustar posición desde Level)
     public float getX() {
         return x;
     }
-
+    
     public float getY() {
         return y;
     }
@@ -117,5 +118,11 @@ public class Player {
     public void setPosition(float x, float y) {
         this.x = x;
         this.y = y;
+    }
+
+    // Dibuja el jugador (será llamado por la Vista)
+    public void draw(Graphics2D g) {
+        g.setColor(Color.RED);
+        g.fillRect((int) x, (int) y, size, size);
     }
 }

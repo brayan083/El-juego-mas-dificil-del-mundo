@@ -1,3 +1,5 @@
+package model;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 
@@ -34,8 +36,7 @@ public class Obstacle {
                 (int) nextPos.getX(),
                 (int) nextPos.getY(),
                 (int) nextPos.getWidth(),
-                (int) nextPos.getHeight()
-        );
+                (int) nextPos.getHeight());
 
         // Verificar colisión con paredes
         boolean collision = collidesWithTileMap(bounds, tileMap, tileSize);
@@ -73,7 +74,8 @@ public class Obstacle {
     }
 
     private boolean collidesWithTileMap(Rectangle bounds, int[][] tileMap, int tileSize) {
-        if (tileMap == null) return false;
+        if (tileMap == null)
+            return false;
 
         int minRow = Math.max(0, bounds.y / tileSize);
         int maxRow = Math.min(tileMap.length - 1, (bounds.y + bounds.height - 1) / tileSize);

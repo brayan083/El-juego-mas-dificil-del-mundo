@@ -1,6 +1,13 @@
+package controller;
 import javax.swing.JPanel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import model.Config;
+import model.Level;
+import model.LevelLoader;
+import model.Obstacle;
+import model.Player;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -14,7 +21,6 @@ public class Game extends JPanel {
     private int deathCount = 0; // Contador de muertes
 
     public Game() {
-        // level = new Level(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT);
         loadLevel(currentLevel);
         gameOver = false;
         setFocusable(true);
