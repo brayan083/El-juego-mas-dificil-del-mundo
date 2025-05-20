@@ -7,7 +7,6 @@ import model.Obstacle;
 import model.Goal;
 import controller.Game; // Para acceder al estado del juego como deathCount, currentLevel, etc.
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -18,37 +17,20 @@ import java.util.ArrayList;
 
 public class GameView {
 
-    // Colores (podrían moverse a Config o una clase ThemeColors más adelante)
-    private static final Color COLOR_PLAYER = Color.RED;
-    private static final Color COLOR_OBSTACLE = Color.BLUE;
-    private static final Color COLOR_GOAL = new Color(165, 255, 163);
-    private static final Color COLOR_WALL_TILE = new Color(179, 179, 255);
-    private static final Color COLOR_BACKGROUND_CHESS_LIGHT = new Color(222, 222, 255); // Lavanda muy claro
-    private static final Color COLOR_BACKGROUND_CHESS_DARK = new Color(247, 247, 255); // Gris claro
-    private static final Color COLOR_PLAY_AREA_BACKGROUND = new Color(179, 179, 255); // Color lavanda para el área
-                                                                                      // externa
-    private static final Color COLOR_HEADER_BACKGROUND = new Color(0, 0, 0);
-    private static final Color COLOR_HEADER_TEXT = Color.WHITE;
-    private static final Color COLOR_GAME_OVER_BACKGROUND = new Color(0, 0, 0, 128); // Negro semi-transparente
-    private static final Color COLOR_GAME_OVER_TEXT = Color.GREEN;
-
-    private static final int HEADER_HEIGHT = 40; // Mover a Config si se prefiere
-
     public void renderGame(Graphics2D g2d, Game gameController, Level currentLevel, int totalLevels) {
         // Dibujar el header
         drawHeader(g2d, gameController, totalLevels);
 
         // Mover el área de juego hacia abajo para dejar espacio al header
-        g2d.translate(0, HEADER_HEIGHT);
+        g2d.translate(0, Config.HEADER_HEIGHT);
 
         // Pintar toda el área externa de color lavanda
-        g2d.setColor(COLOR_PLAY_AREA_BACKGROUND);
-        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - HEADER_HEIGHT);
+        g2d.setColor(Config.COLOR_PLAY_AREA_BACKGROUND);
+        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - Config.HEADER_HEIGHT);
 
         if (gameController.isGameOver() && currentLevel == null) { // Caso de juego completado
             // Restaurar la transformación antes de dibujar pantalla de game over que ocupa
-            // todo
-            g2d.translate(0, -HEADER_HEIGHT);
+            g2d.translate(0, - Config.HEADER_HEIGHT);
             drawGameOverScreen(g2d, "¡Juego Completado!");
         } else if (currentLevel != null) {
             // Calcular el área jugable (rectángulo que encierra las paredes)
@@ -78,21 +60,21 @@ public class GameView {
     }
 
     private void drawHeader(Graphics2D g2d, Game gameController, int totalLevels) {
-        g2d.setColor(COLOR_HEADER_BACKGROUND);
-        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, HEADER_HEIGHT);
+        g2d.setColor(Config.COLOR_HEADER_BACKGROUND);
+        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.HEADER_HEIGHT);
 
-        g2d.setColor(COLOR_HEADER_TEXT);
+        g2d.setColor(Config.COLOR_HEADER_TEXT);
         g2d.setFont(new Font("Monospaced", Font.BOLD, 18));
         g2d.drawString("Nivel: " + (gameController.getCurrentLevelIndex() + 1) + "/" + totalLevels, 20,
-                HEADER_HEIGHT / 2 + 5); // Ajustar Y para centrar
-        g2d.drawString("Muertes: " + gameController.getDeathCount(), Config.WINDOW_WIDTH - 150, HEADER_HEIGHT / 2 + 5); // Ajustar
+                Config.HEADER_HEIGHT / 2 + 5); // Ajustar Y para centrar
+        g2d.drawString("Muertes: " + gameController.getDeathCount(), Config.WINDOW_WIDTH - 150, Config.HEADER_HEIGHT / 2 + 5); // Ajustar
                                                                                                                         // Y
     }
 
     private Shape calculatePlayArea(Level level) {
         if (level == null || level.getTileMap() == null) {
             // System.out.println("No hay tileMap, usando área por defecto para playArea.");
-            return new Rectangle(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - HEADER_HEIGHT);
+            return new Rectangle(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - Config.HEADER_HEIGHT);
         }
 
         int[][] tileMap = level.getTileMap();
@@ -116,7 +98,7 @@ public class GameView {
                                      // Considera hacerlo una constante en GameView o Config.
         boolean isWhite = true; // Determina el color del primer tile (0,0) del chessboard
 
-        for (int y = 0; y < Config.WINDOW_HEIGHT - HEADER_HEIGHT; y += chessboardTileSize) {
+        for (int y = 0; y < Config.WINDOW_HEIGHT - Config.HEADER_HEIGHT; y += chessboardTileSize) {
             // Para cada nueva fila, el color de inicio debe ser el opuesto al de la celda
             // (x=0) de la fila anterior.
             // Pero, más simple: mantenemos el color de la última celda de la fila anterior
@@ -126,9 +108,9 @@ public class GameView {
 
             for (int x = 0; x < Config.WINDOW_WIDTH; x += chessboardTileSize) {
                 if (rowStartIsWhite) {
-                    g2d.setColor(COLOR_BACKGROUND_CHESS_LIGHT);
+                    g2d.setColor(Config.COLOR_BACKGROUND_CHESS_LIGHT);
                 } else {
-                    g2d.setColor(COLOR_BACKGROUND_CHESS_DARK);
+                    g2d.setColor(Config.COLOR_BACKGROUND_CHESS_DARK);
                 }
                 g2d.fillRect(x, y, chessboardTileSize, chessboardTileSize);
                 rowStartIsWhite = !rowStartIsWhite; // Alternar para la siguiente celda en la misma fila
@@ -147,7 +129,7 @@ public class GameView {
             for (int i = 0; i < tileMap.length; i++) {
                 for (int j = 0; j < tileMap[i].length; j++) {
                     if (tileMap[i][j] == 1) { // Pared
-                        g2d.setColor(COLOR_WALL_TILE);
+                        g2d.setColor(Config.COLOR_WALL_TILE);
                         g2d.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
                     }
                 }
@@ -176,13 +158,13 @@ public class GameView {
     }
 
     private void drawPlayer(Graphics2D g2d, Player player) {
-        g2d.setColor(COLOR_PLAYER);
+        g2d.setColor(Config.COLOR_PLAYER);
         Rectangle bounds = player.getBounds(); // Asumiendo que Player tiene getBounds()
         g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
     private void drawObstacle(Graphics2D g2d, Obstacle obstacle) {
-        g2d.setColor(COLOR_OBSTACLE);
+        g2d.setColor(Config.COLOR_OBSTACLE);
         // Obstacle.getBounds() devuelve Ellipse2D.Float.
         // Usaremos los datos del obstáculo para dibujar, ya que Ellipse2D no tiene
         // x,y,radius directos
@@ -195,18 +177,18 @@ public class GameView {
     }
 
     private void drawGoal(Graphics2D g2d, Goal goal) {
-        g2d.setColor(COLOR_GOAL);
+        g2d.setColor(Config.COLOR_GOAL);
         Rectangle bounds = goal.getBounds(); // Asumiendo que Goal tiene getBounds()
         g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
     public void drawGameOverScreen(Graphics2D g2d, String message) {
         // Fondo negro semi-transparente
-        g2d.setColor(COLOR_GAME_OVER_BACKGROUND);
+        g2d.setColor(Config.COLOR_GAME_OVER_BACKGROUND);
         g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT); // Cubre toda la ventana
 
         // Mensaje
-        g2d.setColor(COLOR_GAME_OVER_TEXT);
+        g2d.setColor(Config.COLOR_GAME_OVER_TEXT);
         g2d.setFont(new Font("Arial", Font.BOLD, 30));
         FontMetrics metrics = g2d.getFontMetrics();
         int x = (Config.WINDOW_WIDTH - metrics.stringWidth(message)) / 2;
