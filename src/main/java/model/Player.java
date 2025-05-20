@@ -1,7 +1,5 @@
 package model;
 
-import java.awt.Graphics2D;
-import java.awt.Color;
 import java.awt.Rectangle;
 
 public class Player {
@@ -16,10 +14,6 @@ public class Player {
         this.y = y;
         this.size = size;
         this.speed = speed;
-        this.movingUp = false;
-        this.movingDown = false;
-        this.movingLeft = false;
-        this.movingRight = false;
     }
 
     // Actualizar posición según estado de teclas
@@ -84,45 +78,15 @@ public class Player {
         return false;
     }
 
-    // Métodos para cambiar el estado de movimiento
-    public void setMovingUp(boolean moving) {
-        movingUp = moving;
-    }
 
-    public void setMovingDown(boolean moving) {
-        movingDown = moving;
-    }
-
-    public void setMovingLeft(boolean moving) {
-        movingLeft = moving;
-    }
-
-    public void setMovingRight(boolean moving) {
-        movingRight = moving;
-    }
-
-    // Obtener área para colisiones
-    public Rectangle getBounds() {
-        return new Rectangle((int) x, (int) y, size, size);
-    }
-
-    // Getters y setters (por si necesitas ajustar posición desde Level)
-    public float getX() {
-        return x;
-    }
-    
-    public float getY() {
-        return y;
-    }
-
-    public void setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    // Dibuja el jugador (será llamado por la Vista)
-    public void draw(Graphics2D g) {
-        g.setColor(Color.RED);
-        g.fillRect((int) x, (int) y, size, size);
-    }
+    // Getters y Setters
+    public void setMovingUp(boolean moving) { movingUp = moving; } //
+    public void setMovingDown(boolean moving) { movingDown = moving; } //
+    public void setMovingLeft(boolean moving) { movingLeft = moving; } //
+    public void setMovingRight(boolean moving) { movingRight = moving; } //
+    public Rectangle getBounds() { return new Rectangle((int) x, (int) y, size, size); } //
+    public float getX() { return x; } //
+    public float getY() { return y; } //
+    public int getSize() { return size; } // <-- AÑADIR SI ES NECESARIO (o GameView usa bounds.width)
+    public void setPosition(float x, float y) { this.x = x; this.y = y; } //
 }

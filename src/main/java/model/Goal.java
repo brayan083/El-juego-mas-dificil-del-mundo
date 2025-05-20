@@ -1,6 +1,4 @@
 package model;
-import java.awt.Graphics2D;
-import java.awt.Color;
 import java.awt.Rectangle;
 
 public class Goal {
@@ -20,9 +18,4 @@ public class Goal {
         return new Rectangle((int)x, (int)y, width, height);
     }
 
-    // Dibujar la meta verde
-    public void draw(Graphics2D g) {
-        g.setColor(new Color(165,255, 163));
-        g.fillRect((int)x, (int)y, width, height);
-    }
 }

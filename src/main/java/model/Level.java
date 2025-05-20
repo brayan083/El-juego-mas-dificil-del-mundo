@@ -1,5 +1,4 @@
 package model;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,70 +19,26 @@ public class Level {
 
     // Actualizar elementos móviles
     public void update() {
-        // Actualizar obstáculos
-        for (Obstacle obstacle : obstacles) {
-            obstacle.update(tileMap, tileSize);
-        }
-
-        // Actualizar jugador con las paredes
-        player.update(windowWidth, windowHeight, tileMap, tileSize);
-    }
-
-    // Dibujar todo
-    public void draw(Graphics2D g) {
-        if (tileMap != null) {
-            for (int i = 0; i < tileMap.length; i++) {
-                for (int j = 0; j < tileMap[i].length; j++) {
-                    if (tileMap[i][j] == 1) {
-                        g.setColor(new Color(179, 179, 255));;
-                        g.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
-                    }
-                }
+        if (obstacles != null) {
+            for (Obstacle obstacle : obstacles) {
+                obstacle.update(tileMap, tileSize);
             }
         }
-        for (Obstacle obstacle : obstacles) {
-            obstacle.draw(g);
+        if (player != null) {
+            player.update(windowWidth, windowHeight - 40, tileMap, tileSize); // Ajustar windowHeight si el jugador no debe entrar al header
         }
-        goal.draw(g);
-        player.draw(g);
     }
 
-    // Getters
-    public Player getPlayer() {
-        return player;
-    }
+    // Getters 
+    public Player getPlayer() { return player; }
+    public ArrayList<Obstacle> getObstacles() { return obstacles; }
+    public Goal getGoal() { return goal; }
+    public int[][] getTileMap() { return tileMap; }
+    public int getTileSize() { return tileSize; }
 
-    public ArrayList<Obstacle> getObstacles() {
-        return obstacles;
-    }
-
-    public Goal getGoal() {
-        return goal;
-    }
-
-    public int[][] getTileMap() {
-        return tileMap;
-    }
-
-    public int getTileSize() {
-        return tileSize;
-    }
-
-    // Setters
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public void setGoal(Goal goal) {
-        this.goal = goal;
-    }
-
-    public void setObstacles(List<Obstacle> obstacles) {
-        this.obstacles = new ArrayList<>(obstacles);
-    }
-
-    public void setTileMap(int[][] tileMap, int tileSize) {
-        this.tileMap = tileMap;
-        this.tileSize = tileSize;
-    }
+    // Setters 
+    public void setPlayer(Player player) { this.player = player; }
+    public void setGoal(Goal goal) { this.goal = goal; }
+    public void setObstacles(List<Obstacle> obstacles) { this.obstacles = new ArrayList<>(obstacles); }
+    public void setTileMap(int[][] tileMap, int tileSize) { this.tileMap = tileMap; this.tileSize = tileSize; }
 }

@@ -100,9 +100,11 @@ public class Obstacle {
         return new Ellipse2D.Float(x - radius, y - radius, radius * 2, radius * 2);
     }
 
-    // Dibujar el círculo azul
-    public void draw(Graphics2D g) {
-        g.setColor(Color.BLUE);
-        g.fillOval((int) (x - radius), (int) (y - radius), radius * 2, radius * 2);
-    }
+
+    // Getters
+    public float getSpeed() { return speed; }
+    public float getX() { return x; }
+    public float getY() { return y; }
+    public int getRadius() { return radius; }
+
 }
