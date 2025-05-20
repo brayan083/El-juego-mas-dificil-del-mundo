@@ -84,9 +84,10 @@ public class Player {
     public void setMovingDown(boolean moving) { movingDown = moving; } //
     public void setMovingLeft(boolean moving) { movingLeft = moving; } //
     public void setMovingRight(boolean moving) { movingRight = moving; } //
+    public void setPosition(float x, float y) { this.x = x; this.y = y; } //
     public Rectangle getBounds() { return new Rectangle((int) x, (int) y, size, size); } //
+    public float getSpeed() { return speed; } //
     public float getX() { return x; } //
     public float getY() { return y; } //
     public int getSize() { return size; } // <-- AÑADIR SI ES NECESARIO (o GameView usa bounds.width)
-    public void setPosition(float x, float y) { this.x = x; this.y = y; } //
 }
