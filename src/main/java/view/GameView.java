@@ -20,7 +20,7 @@ public class GameView {
 
     public void renderGame(Graphics2D g2d, Game gameController, Level currentLevel, int totalLevels) {
         // Dibujar el header
-        drawHeader(g2d, gameController, totalLevels);
+        drawHeader(g2d, gameController, totalLevels, currentLevel);
 
         // Mover el área de juego hacia abajo para dejar espacio al header
         g2d.translate(0, Config.HEADER_HEIGHT);
@@ -60,27 +60,32 @@ public class GameView {
         // o al final de paintComponent
     }
 
-    private void drawHeader(Graphics2D g2d, Game gameController, int totalLevels) {
-        g2d.setColor(Config.COLOR_HEADER_BACKGROUND);
-        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.HEADER_HEIGHT);
+   private void drawHeader(Graphics2D g2d, Game gameController, int totalLevels, Level currentLevel) {
+        g2d.setColor(Config.COLOR_HEADER_BACKGROUND); //
+        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.HEADER_HEIGHT); //
 
-        g2d.setColor(Config.COLOR_HEADER_TEXT);
-        g2d.setFont(new Font("Monospaced", Font.BOLD, 18));
-        String levelText = "Nivel: " + (gameController.getCurrentLevelIndex() + 1) + "/" + totalLevels;
-        g2d.drawString(levelText, 20, Config.HEADER_HEIGHT / 2 + 5);
+        g2d.setColor(Config.COLOR_HEADER_TEXT); //
+        g2d.setFont(new Font("Monospaced", Font.BOLD, 18)); //
+        
+        String levelText = "Nivel: " + (gameController.getCurrentLevelIndex() + 1) + "/" + totalLevels; //
+        g2d.drawString(levelText, 20, Config.HEADER_HEIGHT / 2 + 5); //
 
-        String deathsText = "Muertes: " + gameController.getDeathCount();
-        FontMetrics metrics = g2d.getFontMetrics(); // Para calcular el ancho del texto de muertes
+        String coinsText = "Monedas: 0/0"; // Texto por defecto si no hay nivel
+        if (currentLevel != null) {
+            int collectedInLevel = currentLevel.getNumberOfCurrentlyCollectedCoinsInLevel();
+            int totalInLevel = currentLevel.getTotalCoinsInLevel();
+            coinsText = "Monedas: " + collectedInLevel + "/" + totalInLevel;
+        }
+
+        FontMetrics metrics = g2d.getFontMetrics(); //
+        int coinsTextWidth = metrics.stringWidth(coinsText);
+        // Posicionar el texto de monedas en el centro del header, por ejemplo
+        g2d.drawString(coinsText, (Config.WINDOW_WIDTH - coinsTextWidth) / 2, Config.HEADER_HEIGHT / 2 + 5);
+
+
+        String deathsText = "Muertes: " + gameController.getDeathCount(); //
         int deathsTextWidth = metrics.stringWidth(deathsText);
-        g2d.drawString(deathsText, Config.WINDOW_WIDTH - deathsTextWidth - 20, Config.HEADER_HEIGHT / 2 + 5);
-
-
-        // Mostrar contador de monedas
-        String coinsText = "Monedas: " + gameController.getCoinsCollected();
-        // Posicionar el texto de monedas, por ejemplo, en el centro o al lado del nivel
-        int levelTextWidth = metrics.stringWidth(levelText);
-        g2d.drawString(coinsText, 20 + levelTextWidth + 50, Config.HEADER_HEIGHT / 2 + 5); // Ajusta el 50 según necesites
-
+        g2d.drawString(deathsText, Config.WINDOW_WIDTH - deathsTextWidth - 20, Config.HEADER_HEIGHT / 2 + 5); //
     }
 
     private Shape calculatePlayArea(Level level) {

@@ -31,6 +31,59 @@ public class Level {
         }
     }
 
+    // Verificar si el jugador ha recogido todas las monedas
+    public boolean areAllCoinsCollectedInLevel() {
+        if (this.coins == null || this.coins.isEmpty()) {
+            return true; // No hay monedas para recolectar, condición cumplida.
+        }
+        for (Coin coin : this.coins) {
+            if (!coin.isCollected()) {
+                return false; // Se encontró al menos una moneda no recolectada.
+            }
+        }
+        return true; // Todas las monedas han sido recolectadas.
+    }
+
+    /**
+     * Obtiene el número de monedas actualmente recolectadas en este nivel.
+     * @return El número de monedas recolectadas.
+     */
+    public int getNumberOfCurrentlyCollectedCoinsInLevel() {
+        if (this.coins == null || this.coins.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (Coin coin : this.coins) {
+            if (coin.isCollected()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Obtiene el número total de monedas disponibles en este nivel.
+     * @return El total de monedas en el nivel.
+     */
+    public int getTotalCoinsInLevel() {
+        if (this.coins == null) {
+            return 0;
+        }
+        return this.coins.size();
+    }
+
+    /**
+     * Reinicia el estado de todas las monedas en el nivel a 'no recolectadas'.
+     * Esto se usará cuando el jugador muera.
+     */
+    public void resetCoinsInLevel() {
+        if (this.coins != null) {
+            for (Coin coin : this.coins) {
+                coin.setCollected(false);
+            }
+        }
+    }
+
     // Getters 
     public Player getPlayer() { return player; }
     public ArrayList<Obstacle> getObstacles() { return obstacles; }

@@ -21,7 +21,7 @@ public class Game extends JPanel {
     private int currentLevelIndex = 0;
     private int deathCount = 0; // Contador de muertes
     private int totalLevels = 0;
-    private int coinsCollected = 0;
+    private int totalCoinsEverCollected = 0;
 
     private InputHandler inputHandler; // Manejador de entrada
     private GameView gameView; // <-- NUEVA INSTANCIA
@@ -103,32 +103,39 @@ public class Game extends JPanel {
         // Colisiones con monedas
         if (level.getCoins() != null) {
             for (Coin coin : level.getCoins()) {
-                if (!coin.isCollected()) { // Solo verificar si no ha sido recolectada
+                if (!coin.isCollected()) {
                     Area playerArea = new Area(playerBounds);
-                    Area coinArea = new Area(coin.getBounds()); // Bounds de la moneda
+                    Area coinArea = new Area(coin.getBounds()); // coin.getBounds() devuelve Ellipse2D
                     playerArea.intersect(coinArea);
                     if (!playerArea.isEmpty()) {
-                        coin.setCollected(true); // Marcar como recolectada
-                        coinsCollected++; // Incrementar contador
-                        // Opcional: Añadir sonido o efecto aquí
-                        System.out.println("Monedas: " + coinsCollected); // Para depuración
+                        coin.setCollected(true);
+                        totalCoinsEverCollected++; // Incrementa el contador global
+                        // System.out.println("Monedas (total juego): " + totalCoinsEverCollected);
                     }
                 }
             }
         }
 
         // Verificar si llegó a la meta
-        if (player.getBounds().intersects(level.getGoal().getBounds())) {
-            if (!gameOver) {
-                currentLevelIndex++;
-                if (currentLevelIndex < totalLevels) {
-                    loadLevel(currentLevelIndex);
+        if (level.getGoal() != null && player.getBounds().intersects(level.getGoal().getBounds())) { //
+            if (!gameOver) { //
+                // ----- INICIO DE LA MODIFICACIÓN -----
+                if (level.areAllCoinsCollectedInLevel()) { // ¡NUEVA CONDICIÓN!
+                    currentLevelIndex++; //
+                    if (currentLevelIndex < totalLevels) { //
+                        loadLevel(currentLevelIndex); //
+                    } else {
+                        // Todos los niveles completados
+                        gameOver = true; //
+                        level = null; //
+                        inputHandler.setActivePlayer(null); //
+                        System.out.println("¡Juego Completado!"); //
+                    }
                 } else {
-                    // Todos los niveles completados
-                    gameOver = true;
-                    level = null; // Indicar que no hay más niveles para jugar
-                    inputHandler.setActivePlayer(null);
-                    System.out.println("¡Juego Completado!");
+                    // Aún no ha recolectado todas las monedas.
+                    // El jugador puede estar sobre la meta, pero no pasa nada.
+                    // Opcional: Mostrar un mensaje al jugador.
+                    System.out.println("¡Necesitas recolectar todas las monedas para avanzar!");
                 }
             }
         }
@@ -136,6 +143,9 @@ public class Game extends JPanel {
 
     private void resetPlayerPosition() {
         deathCount++;
+        if (level != null) {
+            level.resetCoinsInLevel();
+        }
         Player player = level.getPlayer();
         JsonNode levelData = LevelLoader.getLevelData(currentLevelIndex); // Usar currentLevelIndex
         if (levelData != null) {
@@ -177,7 +187,7 @@ public class Game extends JPanel {
     }
 
     public int getCoinsCollected() {
-        return coinsCollected;
+        return totalCoinsEverCollected;
     }
 
     public boolean isGameOver() {
