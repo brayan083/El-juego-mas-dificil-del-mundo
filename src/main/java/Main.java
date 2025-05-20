@@ -13,7 +13,6 @@ public class Main {
         JFrame frame = new JFrame("World's Hardest Game");
         Game game = new Game();
 
-
         game.setBackground(Color.WHITE); // Color de fondo del área de juego
         game.setPreferredSize(new Dimension(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT)); // Dimensiones del área de juego
         frame.add(game);
@@ -22,6 +21,8 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
         frame.setVisible(true);
+
+        game.requestFocusInWindow(); 
 
         // Bucle del juego
         Timer timer = new Timer();

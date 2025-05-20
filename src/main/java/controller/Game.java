@@ -1,8 +1,10 @@
 package controller;
+
 import javax.swing.JPanel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import handler.InputHandler;
 import model.Config;
 import model.Level;
 import model.LevelLoader;
@@ -10,8 +12,6 @@ import model.Obstacle;
 import model.Player;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Area;
 
 public class Game extends JPanel {
@@ -20,71 +20,36 @@ public class Game extends JPanel {
     private int currentLevel = 0;
     private int deathCount = 0; // Contador de muertes
 
+    private InputHandler inputHandler; // Manejador de entrada
+
     public Game() {
+        inputHandler = new InputHandler();
+        addKeyListener(inputHandler); // Registrar InputHandler como KeyListener
+        // Es crucial que loadLevel se llame DESPUÉS de inicializar inputHandler
+        // y que inputHandler.setActivePlayer se llame DESPUÉS de que el jugador del
+        // nivel esté disponible.
         loadLevel(currentLevel);
         gameOver = false;
-        setFocusable(true);
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                handleKeyPressed(e);
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                handleKeyReleased(e);
-            }
-        });
+        setFocusable(true); // Asegúrate de que el JPanel pueda recibir foco para los eventos de teclado
     }
 
     private void loadLevel(int levelIndex) {
         Level newLevel = LevelLoader.loadLevel(levelIndex);
         if (newLevel == null) {
-            // Si no hay más niveles, mostrar Game Over
             gameOver = true;
             currentLevel--; // Mantener el último nivel válido
+            if (inputHandler != null) {
+                inputHandler.setActivePlayer(null); // No hay jugador activo
+            }
             // Mantenemos el último nivel en lugar de hacerlo null
             return;
         }
         level = newLevel;
         gameOver = false;
-    }
-
-    private void handleKeyPressed(KeyEvent e) {
-        if (!gameOver) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_UP:
-                    level.getPlayer().setMovingUp(true);
-                    break;
-                case KeyEvent.VK_DOWN:
-                    level.getPlayer().setMovingDown(true);
-                    break;
-                case KeyEvent.VK_LEFT:
-                    level.getPlayer().setMovingLeft(true);
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    level.getPlayer().setMovingRight(true);
-                    break;
-            }
-        }
-    }
-
-    private void handleKeyReleased(KeyEvent e) {
-        if (!gameOver) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_UP:
-                    level.getPlayer().setMovingUp(false);
-                    break;
-                case KeyEvent.VK_DOWN:
-                    level.getPlayer().setMovingDown(false);
-                    break;
-                case KeyEvent.VK_LEFT:
-                    level.getPlayer().setMovingLeft(false);
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    level.getPlayer().setMovingRight(false);
-                    break;
-            }
+        if (inputHandler != null && level.getPlayer() != null) {
+            inputHandler.setActivePlayer(level.getPlayer()); // Establecer el jugador activo
+        } else if (inputHandler != null) {
+            inputHandler.setActivePlayer(null); // Si no hay jugador por alguna razón
         }
     }
 
@@ -198,14 +163,15 @@ public class Game extends JPanel {
             int y = (getHeight() - metrics.getHeight()) / 2 + metrics.getAscent();
             g2d.drawString(message, x, y);
         }
-        
+
         // Restaurar la transformación
         g2d.translate(0, -30);
     }
 
     private Shape calculatePlayArea() {
         if (level == null || level.getTileMap() == null) {
-            System.out.println("No hay tileMap, usando área por defecto: (0, 0, " + Config.WINDOW_WIDTH + ", " + (Config.WINDOW_HEIGHT - 30) + ")");
+            System.out.println("No hay tileMap, usando área por defecto: (0, 0, " + Config.WINDOW_WIDTH + ", "
+                    + (Config.WINDOW_HEIGHT - 30) + ")");
             return new Rectangle(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - 30);
         }
 
