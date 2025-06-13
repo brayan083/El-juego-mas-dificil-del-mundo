@@ -10,6 +10,8 @@ public class Level {
     private int[][] tileMap; // Cuadrícula del mapa
     private int tileSize; // Tamaño de cada celda
     private int windowWidth, windowHeight; // Límites de la ventana
+    private Key key;
+    private boolean doorsAreOpen;
 
     // Constructor
     public Level(int windowWidth, int windowHeight) {
@@ -17,6 +19,7 @@ public class Level {
         this.windowHeight = windowHeight;
         this.obstacles = new ArrayList<>();
         this.coins = new ArrayList<>();
+        this.doorsAreOpen = false; 
     }
 
     // Actualizar elementos móviles
@@ -27,7 +30,7 @@ public class Level {
             }
         }
         if (player != null) {
-            player.update(windowWidth, windowHeight - Config.HEADER_HEIGHT, tileMap, tileSize);
+            player.update(this);
         }
     }
 
@@ -82,6 +85,18 @@ public class Level {
                 coin.setCollected(false);
             }
         }
+        if (this.key != null) {
+            this.key.setCollected(false); // <-- REINICIAR LA LLAVE
+        }
+        this.doorsAreOpen = false;
+    }
+
+    public void openDoors() {
+        this.doorsAreOpen = true;
+    }
+
+    public boolean areDoorsOpen() {
+        return doorsAreOpen;
     }
 
     // Getters 
@@ -91,6 +106,8 @@ public class Level {
     public ArrayList<Coin> getCoins() { return coins; }
     public int[][] getTileMap() { return tileMap; }
     public int getTileSize() { return tileSize; }
+    public int getWindowWidth() { return windowWidth; }
+    public int getWindowHeight() { return windowHeight; }
 
     // Setters 
     public void setPlayer(Player player) { this.player = player; }
@@ -98,4 +115,14 @@ public class Level {
     public void setCoins(List<Coin> coins) { this.coins = new ArrayList<>(coins); }
     public void setObstacles(List<Obstacle> obstacles) { this.obstacles = new ArrayList<>(obstacles); }
     public void setTileMap(int[][] tileMap, int tileSize) { this.tileMap = tileMap; this.tileSize = tileSize; }
+
+    // Getters y Setters para la llave
+    public Key getKey() {
+        return key;
+    }
+
+    public void setKey(Key key) {
+        this.key = key;
+    }
+
 }

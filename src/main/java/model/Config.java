@@ -13,12 +13,18 @@ public class Config {
     public static final Color COLOR_PLAYER = Color.RED;
     public static final Color COLOR_OBSTACLE = Color.BLUE;
     public static final Color COLOR_GOAL = new Color(165, 255, 163);
+    public static final Color COLOR_KEY = new Color(0, 255, 255); // <-- AÑADIR (Color Cian)
     public static final Color COLOR_WALL_TILE = new Color(179, 179, 255);
+    public static final Color COLOR_SAFE_ZONE_TILE = Color.DARK_GRAY;
+    public static final Color COLOR_KEY_BORDER = new Color(255, 153, 153); // <-- AÑADIR (Color Rojo Claro)
+    public static final Color COLOR_KEY_GOLD = new Color(255, 215, 0); // Un dorado brillante
+    public static final Color COLOR_KEY_SHADOW = new Color(218, 165, 32); // Un dorado oscuro para el detalle
 
     // Colores del fondo del área de juego
     public static final Color COLOR_BACKGROUND_CHESS_LIGHT = new Color(222, 222, 255); // Lavanda muy claro
     public static final Color COLOR_BACKGROUND_CHESS_DARK = new Color(247, 247, 255); // Gris claro
-    public static final Color COLOR_PLAY_AREA_BACKGROUND = new Color(179, 179, 255); // Color lavanda para el área externa
+    public static final Color COLOR_PLAY_AREA_BACKGROUND = new Color(160, 160, 220); // Un lavanda más oscuro
+                                                                                     // externa
 
     // Colores del Header
     public static final Color COLOR_HEADER_BACKGROUND = new Color(0, 0, 0);

@@ -55,6 +55,17 @@ public class LevelLoader {
                     goalNode.get("width").intValue(),
                     goalNode.get("height").intValue()));
 
+            // Cargar llave (si existe)
+            if (levelNode.has("key")) {
+                JsonNode keyNode = levelNode.get("key");
+                level.setKey(new Key(
+                    keyNode.get("x").floatValue(),
+                    keyNode.get("y").floatValue(),
+                    keyNode.get("width").intValue(),
+                    keyNode.get("height").intValue()
+                ));
+            }
+
             // Cargar obstáculos
             List<Obstacle> obstacles = new ArrayList<>();
             for (JsonNode obstacleNode : levelNode.get("obstacles")) {

@@ -15,6 +15,8 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 
+import model.Key;
+
 public class Game extends JPanel {
     private Level level;
     private boolean gameOver;
@@ -97,6 +99,15 @@ public class Game extends JPanel {
                     resetPlayerPosition();
                     return;
                 }
+            }
+        }
+
+        // Verificar colisiones con la llave
+        Key key = level.getKey();
+        if (key != null && !key.isCollected()) {
+            if (playerBounds.intersects(key.getBounds())) {
+                key.setCollected(true);
+                level.openDoors(); // Abrir las puertas
             }
         }
 

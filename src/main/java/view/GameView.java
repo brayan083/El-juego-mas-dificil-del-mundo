@@ -16,6 +16,8 @@ import java.awt.geom.Area;
 import java.util.ArrayList;
 import model.Coin;
 
+import model.Key;
+
 public class GameView {
 
     public void renderGame(Graphics2D g2d, Game gameController, Level currentLevel, int totalLevels) {
@@ -31,7 +33,7 @@ public class GameView {
 
         if (gameController.isGameOver() && currentLevel == null) { // Caso de juego completado
             // Restaurar la transformación antes de dibujar pantalla de game over que ocupa
-            g2d.translate(0, - Config.HEADER_HEIGHT);
+            g2d.translate(0, -Config.HEADER_HEIGHT);
             drawGameOverScreen(g2d, "¡Juego Completado!");
         } else if (currentLevel != null) {
             // Calcular el área jugable (rectángulo que encierra las paredes)
@@ -60,13 +62,13 @@ public class GameView {
         // o al final de paintComponent
     }
 
-   private void drawHeader(Graphics2D g2d, Game gameController, int totalLevels, Level currentLevel) {
+    private void drawHeader(Graphics2D g2d, Game gameController, int totalLevels, Level currentLevel) {
         g2d.setColor(Config.COLOR_HEADER_BACKGROUND); //
         g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.HEADER_HEIGHT); //
 
         g2d.setColor(Config.COLOR_HEADER_TEXT); //
         g2d.setFont(new Font("Monospaced", Font.BOLD, 18)); //
-        
+
         String levelText = "Nivel: " + (gameController.getCurrentLevelIndex() + 1) + "/" + totalLevels; //
         g2d.drawString(levelText, 20, Config.HEADER_HEIGHT / 2 + 5); //
 
@@ -82,7 +84,6 @@ public class GameView {
         // Posicionar el texto de monedas en el centro del header, por ejemplo
         g2d.drawString(coinsText, (Config.WINDOW_WIDTH - coinsTextWidth) / 2, Config.HEADER_HEIGHT / 2 + 5);
 
-
         String deathsText = "Muertes: " + gameController.getDeathCount(); //
         int deathsTextWidth = metrics.stringWidth(deathsText);
         g2d.drawString(deathsText, Config.WINDOW_WIDTH - deathsTextWidth - 20, Config.HEADER_HEIGHT / 2 + 5); //
@@ -90,7 +91,6 @@ public class GameView {
 
     private Shape calculatePlayArea(Level level) {
         if (level == null || level.getTileMap() == null) {
-            // System.out.println("No hay tileMap, usando área por defecto para playArea.");
             return new Rectangle(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - Config.HEADER_HEIGHT);
         }
 
@@ -100,7 +100,10 @@ public class GameView {
 
         for (int i = 0; i < tileMap.length; i++) {
             for (int j = 0; j < tileMap[i].length; j++) {
-                if (tileMap[i][j] == 0) { // Suelo (parte jugable)
+                // ANTES: if (tileMap[i][j] == 0)
+                // AHORA: Incluimos tanto el suelo (0) como las puertas (2) en el área del
+                // tablero.
+                if (tileMap[i][j] == 0 || tileMap[i][j] == 2) {
                     playAreaShape.add(new Area(new Rectangle(j * tileSize, i * tileSize, tileSize, tileSize)));
                 }
             }
@@ -143,14 +146,28 @@ public class GameView {
         if (level.getTileMap() != null) {
             int[][] tileMap = level.getTileMap();
             int tileSize = level.getTileSize();
+            boolean doorsOpen = level.areDoorsOpen(); // Obtener el estado de la puerta
+
             for (int i = 0; i < tileMap.length; i++) {
                 for (int j = 0; j < tileMap[i].length; j++) {
                     if (tileMap[i][j] == 1) { // Pared
                         g2d.setColor(Config.COLOR_WALL_TILE);
                         g2d.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
+
+                        // ---- ESTA LÍNEA ES LA CLAVE DEL DIBUJADO ----
+                        // Solo dibuja la puerta (2) si las puertas están CERRADAS (!doorsOpen)
+                    } else if (tileMap[i][j] == 2 && !doorsOpen) {
+                        g2d.setColor(Config.COLOR_SAFE_ZONE_TILE);
+                        g2d.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
                     }
                 }
             }
+        }
+
+        // Dibujar llave (si existe y no ha sido recolectada)
+        Key key = level.getKey();
+        if (key != null && !key.isCollected()) {
+            drawKey(g2d, key);
         }
 
         // Dibujar obstáculos
@@ -161,7 +178,7 @@ public class GameView {
             }
         }
 
-        // Dibujar monedas 
+        // Dibujar monedas
         ArrayList<Coin> coins = level.getCoins();
         if (coins != null) {
             for (Coin coin : coins) {
@@ -182,6 +199,45 @@ public class GameView {
         if (player != null) {
             drawPlayer(g2d, player);
         }
+    }
+
+    // NUEVO MÉTODO PARA DIBUJAR LA LLAVE
+    private void drawKey(Graphics2D g2d, Key key) {
+        Rectangle bounds = key.getBounds();
+
+        // --- Definimos las partes de la llave basadas en sus dimensiones ---
+
+        // La cabeza de la llave será un círculo tan ancho como la 'width' de la llave
+        int headDiameter = bounds.width;
+
+        // El vástago será un rectángulo delgado y centrado
+        int shaftWidth = 4; // Grosor del vástago
+        int shaftX = bounds.x + (headDiameter / 2) - (shaftWidth / 2); // Lo centramos
+        // El vástago empieza en el centro de la cabeza y baja hasta el final
+        int shaftY = bounds.y + (headDiameter / 2);
+        int shaftHeight = bounds.height - (headDiameter / 2);
+
+        // El diente de la llave
+        int toothWidth = headDiameter / 2 + 2;
+        int toothHeight = 5;
+        int toothY = bounds.y + bounds.height - toothHeight - 2;
+
+        // --- Dibujamos la llave por partes ---
+
+        // 1. Dibuja el vástago (el cuerpo principal)
+        g2d.setColor(Config.COLOR_KEY_GOLD);
+        g2d.fillRect(shaftX, shaftY, shaftWidth, shaftHeight);
+
+        // 2. Dibuja el diente
+        g2d.fillRect(shaftX, toothY, toothWidth, toothHeight);
+
+        // 3. Dibuja la cabeza de la llave
+        g2d.setColor(Config.COLOR_KEY_GOLD);
+        g2d.fillOval(bounds.x, bounds.y, headDiameter, headDiameter);
+
+        // 4. Dibuja un "agujero" o detalle oscuro en la cabeza para darle profundidad
+        g2d.setColor(Config.COLOR_KEY_SHADOW);
+        g2d.fillOval(bounds.x + 3, bounds.y + 3, headDiameter - 6, headDiameter - 6);
     }
 
     private void drawPlayer(Graphics2D g2d, Player player) {
@@ -209,15 +265,14 @@ public class GameView {
         g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
-    // Método para dibujar una moneda 
+    // Método para dibujar una moneda
     private void drawCoin(Graphics2D g2d, Coin coin) {
         g2d.setColor(Config.COLOR_COIN);
         g2d.fillOval(
-            (int)(coin.getX() - coin.getRadius()),
-            (int)(coin.getY() - coin.getRadius()),
-            coin.getRadius() * 2,
-            coin.getRadius() * 2
-        );
+                (int) (coin.getX() - coin.getRadius()),
+                (int) (coin.getY() - coin.getRadius()),
+                coin.getRadius() * 2,
+                coin.getRadius() * 2);
         // Opcional: Dibujar un borde o un brillo
         // g2d.setColor(Color.YELLOW.darker());
         // g2d.drawOval(...);
