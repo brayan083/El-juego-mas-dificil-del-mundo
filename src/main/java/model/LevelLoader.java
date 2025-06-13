@@ -1,9 +1,11 @@
 package model;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Rectangle;
 
 public class LevelLoader {
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -56,26 +58,37 @@ public class LevelLoader {
             // Cargar obstáculos
             List<Obstacle> obstacles = new ArrayList<>();
             for (JsonNode obstacleNode : levelNode.get("obstacles")) {
-                obstacles.add(new Obstacle(
+                List<Rectangle> customBarriers = new ArrayList<>(); // Siempre crea la lista
+                if (obstacleNode.has("customBounceBarriers")) {
+                    for (JsonNode barrierNode : obstacleNode.get("customBounceBarriers")) {
+                        customBarriers.add(new Rectangle(
+                                barrierNode.get("x").intValue(),
+                                barrierNode.get("y").intValue(),
+                                barrierNode.get("width").intValue(),
+                                barrierNode.get("height").intValue()));
+                    }
+                }
+
+                obstacles.add(new Obstacle( // Llama al constructor con la lista de barreras (puede estar vacía)
                         obstacleNode.get("x").floatValue(),
                         obstacleNode.get("y").floatValue(),
                         obstacleNode.get("radius").intValue(),
                         obstacleNode.get("speed").floatValue(),
                         obstacleNode.get("horizontal").booleanValue(),
-                        Config.WINDOW_WIDTH,
-                        Config.WINDOW_HEIGHT));
+                        Config.WINDOW_WIDTH, // Asumiendo que tienes una clase Config con estas constantes
+                        Config.WINDOW_HEIGHT,
+                        customBarriers));
             }
             level.setObstacles(obstacles);
 
-            // Cargar monedas 
+            // Cargar monedas
             List<Coin> coins = new ArrayList<>();
             if (levelNode.has("coins")) { // Verificar si el array "coins" existe
                 for (JsonNode coinNode : levelNode.get("coins")) {
                     coins.add(new Coin(
                             coinNode.get("x").floatValue(),
                             coinNode.get("y").floatValue(),
-                            coinNode.get("radius").intValue()
-                    ));
+                            coinNode.get("radius").intValue()));
                 }
             }
             level.setCoins(coins);
@@ -119,8 +132,8 @@ public class LevelLoader {
     public static int getTotalLevels() {
         try {
             if (rootNode == null) {
-            InputStream is = LevelLoader.class.getResourceAsStream("/levels.json");
-            rootNode = mapper.readTree(is);
+                InputStream is = LevelLoader.class.getResourceAsStream("/levels.json");
+                rootNode = mapper.readTree(is);
             }
             return rootNode.get("levels").size();
         } catch (Exception e) {

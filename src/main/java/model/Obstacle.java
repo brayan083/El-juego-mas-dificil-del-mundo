@@ -2,6 +2,8 @@ package model;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Obstacle {
     private float x, y; // Posición del centro del círculo
@@ -9,84 +11,102 @@ public class Obstacle {
     private float speed; // Velocidad (positiva o negativa)
     private boolean isHorizontal; // True: mueve horizontal, False: mueve vertical
     private int windowWidth, windowHeight; // Límites de la ventana
+    private List<Rectangle> customBounceBarriers;
 
-    // Constructor
+    // Constructor principal que incluye barreras de rebote personalizadas
     public Obstacle(float x, float y, int radius, float speed, boolean isHorizontal, int windowWidth,
-            int windowHeight) {
+                    int windowHeight, List<Rectangle> customBounceBarriers) {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.speed = speed; // Velocidad única (se aplica a X o Y según isHorizontal)
+        this.speed = speed;
         this.isHorizontal = isHorizontal;
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
+        // Asegura que customBounceBarriers nunca sea null para evitar NullPointerExceptions
+        this.customBounceBarriers = (customBounceBarriers != null) ? customBounceBarriers : new ArrayList<>();
     }
 
-    // Actualizar posición con rebote
+    // Constructor sobrecargado (sin barreras personalizadas explícitas)
+    // Este constructor resuelve el error "undefined constructor" si se llama sin la lista de barreras.
+    // Delega al constructor principal con una lista vacía de barreras.
+    public Obstacle(float x, float y, int radius, float speed, boolean isHorizontal, int windowWidth, int windowHeight) {
+        this(x, y, radius, speed, isHorizontal, windowWidth, windowHeight, new ArrayList<>());
+    }
+
     public void update(int[][] tileMap, int tileSize) {
-        // Calcular nueva posición
-        float newX = x + (isHorizontal ? speed : 0);
-        float newY = y + (isHorizontal ? 0 : speed);
+        // Posición tentativa para el próximo frame
+        float tentativeX = x;
+        float tentativeY = y;
 
-        // Crear un área de prueba para la nueva posición
-        Ellipse2D nextPos = new Ellipse2D.Float(newX - radius, newY - radius, radius * 2, radius * 2);
-
-        // Convertir Rectangle2D a Rectangle
-        Rectangle bounds = new Rectangle(
-                (int) nextPos.getX(),
-                (int) nextPos.getY(),
-                (int) nextPos.getWidth(),
-                (int) nextPos.getHeight());
-
-        // Verificar colisión con paredes
-        boolean collision = collidesWithTileMap(bounds, tileMap, tileSize);
         if (isHorizontal) {
-            // Verificar colisión con bordes de la ventana o paredes
-            if (newX - radius <= 0 || newX + radius >= windowWidth || collision) {
-                speed = -speed; // Invertir dirección
-                // Ajustar posición para evitar que se pegue
-                if (newX - radius <= 0) {
-                    newX = radius + 1.0f; // Margen adicional
-                } else if (newX + radius >= windowWidth) {
-                    newX = windowWidth - radius - 1.0f;
-                } else if (collision) {
-                    newX = x; // Revertir movimiento
-                }
-            }
+            tentativeX += speed;
         } else {
-            // Verificar colisión con bordes de la ventana o paredes
-            if (newY - radius <= 0 || newY + radius >= windowHeight || collision) {
-                speed = -speed; // Invertir dirección
-                // Ajustar posición
-                if (newY - radius <= 0) {
-                    newY = radius + 1.0f;
-                } else if (newY + radius >= windowHeight) {
-                    newY = windowHeight - radius - 1.0f;
-                } else if (collision) {
-                    newY = y; // Revertir movimiento
-                }
+            tentativeY += speed;
+        }
+
+        // Límites del obstáculo en la posición tentativa
+        Rectangle nextPosBounds = new Rectangle(
+                (int) (tentativeX - radius),
+                (int) (tentativeY - radius),
+                radius * 2,
+                radius * 2);
+
+        // Comprobar colisiones
+        boolean collisionWithTileMap = collidesWithTileMap(nextPosBounds, tileMap, tileSize);
+        boolean collisionWithCustomBarrier = false;
+        for (Rectangle barrier : this.customBounceBarriers) {
+            if (nextPosBounds.intersects(barrier)) {
+                collisionWithCustomBarrier = true;
+                break;
             }
         }
 
-        // Actualizar posición
-        x = newX;
-        y = newY;
+        boolean internalCollision = collisionWithTileMap || collisionWithCustomBarrier;
+
+        if (isHorizontal) {
+            // Colisión con bordes de ventana o barreras internas
+            if (tentativeX - radius < 0 || tentativeX + radius > windowWidth || internalCollision) {
+                speed = -speed; // Invertir velocidad
+                if (internalCollision) {
+                    // No actualizar 'x', el obstáculo se queda en su posición actual
+                    // para evitar penetrar la barrera. Se moverá en la nueva dirección en el próximo frame.
+                } else if (tentativeX - radius < 0) {
+                    x = radius; // Ajustar al borde izquierdo
+                } else if (tentativeX + radius > windowWidth) {
+                    x = windowWidth - radius; // Ajustar al borde derecho
+                }
+            } else {
+                x = tentativeX; // Mover si no hay colisión
+            }
+        } else { // Movimiento vertical
+            // Colisión con bordes de ventana o barreras internas
+            if (tentativeY - radius < 0 || tentativeY + radius > windowHeight || internalCollision) {
+                speed = -speed; // Invertir velocidad
+                if (internalCollision) {
+                    // No actualizar 'y' por la misma razón que con 'x'.
+                } else if (tentativeY - radius < 0) {
+                    y = radius; // Ajustar al borde superior
+                } else if (tentativeY + radius > windowHeight) {
+                    y = windowHeight - radius; // Ajustar al borde inferior
+                }
+            } else {
+                y = tentativeY; // Mover si no hay colisión
+            }
+        }
     }
 
-    private boolean collidesWithTileMap(Rectangle bounds, int[][] tileMap, int tileSize) {
-        if (tileMap == null)
-            return false;
+    private boolean collidesWithTileMap(Rectangle objectBounds, int[][] tileMap, int tileSize) {
+        int startCol = Math.max(0, objectBounds.x / tileSize);
+        int endCol = Math.min(tileMap[0].length - 1, (objectBounds.x + objectBounds.width) / tileSize);
+        int startRow = Math.max(0, objectBounds.y / tileSize);
+        int endRow = Math.min(tileMap.length - 1, (objectBounds.y + objectBounds.height) / tileSize);
 
-        int minRow = Math.max(0, bounds.y / tileSize);
-        int maxRow = Math.min(tileMap.length - 1, (bounds.y + bounds.height - 1) / tileSize);
-        int minCol = Math.max(0, bounds.x / tileSize);
-        int maxCol = Math.min(tileMap[0].length - 1, (bounds.x + bounds.width - 1) / tileSize);
-
-        for (int i = minRow; i <= maxRow; i++) {
-            for (int j = minCol; j <= maxCol; j++) {
-                if (tileMap[i][j] == 1) {
-                    Rectangle tileRect = new Rectangle(j * tileSize, i * tileSize, tileSize, tileSize);
-                    if (bounds.intersects(tileRect)) {
+        for (int row = startRow; row <= endRow; row++) {
+            for (int col = startCol; col <= endCol; col++) {
+                if (tileMap[row][col] == 1) { // 1 representa una pared
+                    Rectangle tileRect = new Rectangle(col * tileSize, row * tileSize, tileSize, tileSize);
+                    if (objectBounds.intersects(tileRect)) {
                         return true;
                     }
                 }
@@ -95,16 +115,11 @@ public class Obstacle {
         return false;
     }
 
-    // Obtener área para colisiones
     public Ellipse2D getBounds() {
         return new Ellipse2D.Float(x - radius, y - radius, radius * 2, radius * 2);
     }
 
-
-    // Getters
-    public float getSpeed() { return speed; }
     public float getX() { return x; }
     public float getY() { return y; }
     public int getRadius() { return radius; }
-
 }
