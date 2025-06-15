@@ -2,6 +2,7 @@
 package view;
 
 import controller.GameController; // Importará el nuevo controlador
+import handler.InputHandler;
 import model.GameModel;
 import model.Config;
 
@@ -22,8 +23,8 @@ public class GamePanel extends JPanel {
         this.setPreferredSize(new Dimension(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT));
 
         setFocusable(true);
-        // El InputHandler ahora lo gestionará el Controller
-        addKeyListener(controller.getInputHandler());
+        // Ahora obtenemos el KeyListener directamente del Singleton.
+        addKeyListener(InputHandler.getInstance());
     }
 
     @Override

@@ -23,11 +23,10 @@ public class GameController {
     // 2. El constructor es PRIVADO.
     // Esto es fundamental, ya que impide que se puedan crear instancias
     // con 'new GameController()' desde fuera de esta clase.
-    private GameController() {
-        // Inicializamos los componentes que son parte interna del controlador.
-        // Aquí podrías usar InputHandler.getInstance() si decides hacerlo Singleton
-        // también.
-        this.inputHandler = new InputHandler();
+     private GameController() {
+        // Obtenemos la única instancia de InputHandler a través de su
+        // "puerta de entrada" pública: el método getInstance().
+        this.inputHandler = InputHandler.getInstance();
     }
 
     // 3. Un método PÚBLICO y ESTÁTICO que crea la instancia si no existe
