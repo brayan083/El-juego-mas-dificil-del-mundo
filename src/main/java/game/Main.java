@@ -1,4 +1,5 @@
 package game;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -6,15 +7,48 @@ import game.controller.GameController;
 import game.model.GameModel;
 import game.model.Level;
 import game.model.Player;
+import game.view.ConsoleView;
 import game.view.GamePanel;
 
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
     public static void main(String[] args) {
-        // runConsoleSimulation(); // Descomenta esto si quieres probar la simulación
-        
+        Scanner scanner = new Scanner(System.in);
+        String choice;
+
+        while (true) { // Bucle infinito hasta que el usuario elija salir
+            choice = displayMainMenu(scanner); // Llama al nuevo método del menú
+
+            switch (choice) {
+                case "1":
+                    runGraphicalGame();
+                    // Nota: El programa terminará cuando se cierre la ventana de Swing.
+                    return; // Salir del método main
+                case "2":
+                    runInteractiveConsoleGame();
+                    break; // Vuelve al menú después de que termine el juego de consola
+                case "3":
+                    runConsoleSimulation();
+                    System.out.println("Presiona Enter para continuar...");
+                    scanner.nextLine(); // Espera a que el usuario presione Enter
+                    break; // Vuelve al menú después de la simulación
+                case "4":
+                    System.out.println("¡Gracias por jugar! Adiós.");
+                    scanner.close();
+                    return; // Termina la aplicación
+                default:
+                    System.out.println("Opción no válida. Por favor, inténtalo de nuevo.");
+                    System.out.println("Presiona Enter para continuar...");
+                    scanner.nextLine(); // Espera a que el usuario presione Enter
+                    break;
+            }
+        }
+    }
+
+    private static void runGraphicalGame() {
         // Es una buena práctica ejecutar el código de la GUI de Swing en el
         // Event Dispatch Thread (EDT) para evitar problemas de concurrencia.
         javax.swing.SwingUtilities.invokeLater(() -> {
@@ -42,7 +76,8 @@ public class Main {
                 frame.setLocationRelativeTo(null); // Centra la ventana.
                 frame.setVisible(true);
 
-                // Es crucial que el panel tenga el foco para poder escuchar los eventos del teclado.
+                // Es crucial que el panel tenga el foco para poder escuchar los eventos del
+                // teclado.
                 gamePanel.requestFocusInWindow();
 
                 // 6. INICIAR EL BUCLE DEL JUEGO (GAME LOOP)
@@ -66,6 +101,70 @@ public class Main {
                 System.exit(1);
             }
         });
+    }
+
+    /**
+     * Nuevo método para correr el juego de forma interactiva en la consola.
+     */
+    private static void runInteractiveConsoleGame() {
+        GameController controller = GameController.getInstance();
+        controller.initGame();
+
+        GameModel model = controller.getGameModel();
+        ConsoleView consoleView = new ConsoleView();
+        try (Scanner scanner = new Scanner(System.in)) {
+
+            // Bucle de juego principal y de un solo hilo
+            while (!model.isGameOver()) {
+                consoleView.render(model); // Dibuja el estado actual
+
+                Level currentLevel = model.getCurrentLevel();
+                if (currentLevel == null) {
+                    break; // El juego ha terminado
+                }
+
+                System.out.print("Comando (w,a,s,d) y Enter (q para salir): ");
+                String input = scanner.nextLine().trim().toLowerCase();
+
+                if (input.isEmpty()) {
+                    continue;
+                }
+                char command = input.charAt(0);
+
+                if (command == 'q') {
+                    break;
+                }
+
+                Player player = model.getPlayer();
+                float currentX = player.getX();
+                float currentY = player.getY();
+                int stepSize = currentLevel.getTileSize(); // Nos moveremos una celda entera
+
+                // Modificamos directamente la posición del jugador
+                switch (command) {
+                    case 'w':
+                        player.setPosition(currentX, currentY - stepSize);
+                        break;
+                    case 's':
+                        player.setPosition(currentX, currentY + stepSize);
+                        break;
+                    case 'a':
+                        player.setPosition(currentX - stepSize, currentY);
+                        break;
+                    case 'd':
+                        player.setPosition(currentX + stepSize, currentY);
+                        break;
+                }
+
+                // Después de mover al jugador, llamamos a update() una vez.
+                // Esto hará que los obstáculos se muevan un paso y que se
+                // comprueben TODAS las colisiones en la nueva posición.
+                controller.update();
+            }
+
+            System.out.println("¡Juego Terminado!");
+            System.out.println("Muertes totales: " + model.getDeathCount());
+        }
     }
 
     /**
@@ -150,5 +249,38 @@ public class Main {
         }
 
         System.out.println("\n--- Fin de la Simulación en Consola ---");
+    }
+
+    private static String displayMainMenu(Scanner scanner) {
+        // Limpia la consola para una presentación limpia
+        ConsoleView.clearConsole();
+
+        // Arte ASCII para el título (¡puedes personalizarlo!)
+        // System.out.println("============================================================");
+        // System.out.println(" ADVERTENCIA: El siguiente juego puede causar...");
+        // System.out.println(" ...frustración, enojo y ganas de voltear la mesa.");
+        // System.out.println();
+        // System.out.println(" (╯°□°)╯︵ ┻━┻");
+        // System.out.println();
+        // System.out.println(" EL JUEGO MÁS DIFÍCIL DEL MUNDO");
+        // System.out.println("============================================================");
+        System.out.println("------------------------------------------------------------");
+        System.out.println("        Respira hondo. Encuentra tu paz interior.");
+        System.out.println("                      (-_-)");
+        System.out.println("              ...la vas a necesitar.");
+        System.out.println();
+        System.out.println("              EL JUEGO MÁS DIFÍCIL DEL MUNDO");
+        System.out.println("------------------------------------------------------------");
+        System.out.println();
+        System.out.println("               MENÚ PRINCIPAL");
+        System.out.println("-----------------------------------------------------------");
+        System.out.println("  1. Jugar (Interfaz Gráfica)");
+        System.out.println("  2. Jugar (Consola Interactiva)");
+        System.out.println("  3. Simulación (Consola)");
+        System.out.println("  4. Salir");
+        System.out.println("-----------------------------------------------------------");
+        System.out.print("Por favor, elige una opción: ");
+
+        return scanner.nextLine().trim();
     }
 }
