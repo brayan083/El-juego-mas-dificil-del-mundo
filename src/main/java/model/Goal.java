@@ -18,4 +18,18 @@ public class Goal {
         return new Rectangle((int)x, (int)y, width, height);
     }
 
+    // Getters
+    public float getX() {
+        return x;
+    }
+    public float getY() {
+        return y;
+    }
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
+    }
+
 }

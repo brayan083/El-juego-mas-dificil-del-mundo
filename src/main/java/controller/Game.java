@@ -13,7 +13,6 @@ import model.Coin;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 
 import model.Key;
 
@@ -93,28 +92,26 @@ public class Game extends JPanel {
     }
 
     private void checkCollisions() {
-        if (level == null || level.getPlayer() == null || level.getGoal() == null)
-            return; // Chequeo de seguridad
-
+        if (level == null || level.getPlayer() == null)
+            return;
         Player player = level.getPlayer();
-        Rectangle playerBounds = player.getBounds();
 
-        // Verificar colisiones con obstáculos
+        // Colisiones con obstáculos usando nuestra nueva utilidad
         if (level.getObstacles() != null) {
-            for (model.Obstacle obstacle : level.getObstacles()) { // Especificar model.Obstacle si hay ambigüedad
-                if (player.getBounds().intersects(obstacle.getBounds().getBounds())) {
+            for (model.Obstacle obstacle : level.getObstacles()) {
+                if (CollisionUtil.intersects(player, obstacle)) { // <-- CÓDIGO ACTUALIZADO
                     resetPlayerPosition();
                     return;
                 }
             }
         }
 
-        // Verificar colisiones con la llave
+        // Colisiones con la llave
         Key key = level.getKey();
         if (key != null && !key.isCollected()) {
-            if (playerBounds.intersects(key.getBounds())) {
+            if (CollisionUtil.intersects(player, key)) { // <-- CÓDIGO ACTUALIZADO
                 key.setCollected(true);
-                level.openDoors(); // Abrir las puertas
+                level.openDoors();
             }
         }
 
@@ -122,20 +119,17 @@ public class Game extends JPanel {
         if (level.getCoins() != null) {
             for (Coin coin : level.getCoins()) {
                 if (!coin.isCollected()) {
-                    Area playerArea = new Area(playerBounds);
-                    Area coinArea = new Area(coin.getBounds()); // coin.getBounds() devuelve Ellipse2D
-                    playerArea.intersect(coinArea);
-                    if (!playerArea.isEmpty()) {
+                    // La compleja verificación con Area se reemplaza por una simple llamada
+                    if (CollisionUtil.intersects(player, coin)) { // <-- CÓDIGO ACTUALIZADO
                         coin.setCollected(true);
-                        totalCoinsEverCollected++; // Incrementa el contador global
-                        // System.out.println("Monedas (total juego): " + totalCoinsEverCollected);
+                        totalCoinsEverCollected++;
                     }
                 }
             }
         }
 
-        // Verificar si llegó a la meta
-        if (level.getGoal() != null && player.getBounds().intersects(level.getGoal().getBounds())) { //
+        // Colisión con la meta
+        if (level.getGoal() != null && CollisionUtil.intersects(player, level.getGoal())) { // <-- CÓDIGO ACTUALIZADO
             if (!gameOver) { //
                 // ----- INICIO DE LA MODIFICACIÓN -----
                 if (level.areAllCoinsCollectedInLevel()) { // ¡NUEVA CONDICIÓN!

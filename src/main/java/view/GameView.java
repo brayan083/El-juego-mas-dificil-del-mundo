@@ -242,8 +242,13 @@ public class GameView {
 
     private void drawPlayer(Graphics2D g2d, Player player) {
         g2d.setColor(Config.COLOR_PLAYER);
-        Rectangle bounds = player.getBounds(); // Asumiendo que Player tiene getBounds()
-        g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        // Ya no usamos getBounds(). Usamos los getters directamente.
+        // Es necesario convertir x e y a int porque fillRect los requiere.
+        g2d.fillRect(
+                (int) player.getX(),
+                (int) player.getY(),
+                player.getSize(),
+                player.getSize());
     }
 
     private void drawObstacle(Graphics2D g2d, Obstacle obstacle) {

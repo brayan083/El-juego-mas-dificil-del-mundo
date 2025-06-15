@@ -1,5 +1,4 @@
 package model;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,30 +93,44 @@ public class Level {
         this.doorsAreOpen = false;
     }
 
+    // ELIMINA O REEMPLAZA el método que usa 'Rectangle' por este:
     /**
-     * Verifica si un área rectangular colisiona con una pared o una puerta cerrada.
-     * @param bounds El área a verificar.
+     * Verifica si un área rectangular (definida por primitivas) colisiona con una pared.
+     * @param x La coordenada x del área a verificar.
+     * @param y La coordenada y del área a verificar.
+     * @param width El ancho del área.
+     * @param height El alto del área.
      * @return true si hay colisión, false en caso contrario.
      */
-    public boolean isCollidingWithWall(Rectangle bounds) {
+    public boolean isCollidingWithWall(float x, float y, int width, int height) {
         if (tileMap == null) return false;
 
-        int minRow = Math.max(0, bounds.y / tileSize);
-        int maxRow = Math.min(tileMap.length - 1, (bounds.y + bounds.height - 1) / tileSize);
-        int minCol = Math.max(0, bounds.x / tileSize);
-        int maxCol = Math.min(tileMap[0].length - 1, (bounds.x + bounds.width - 1) / tileSize);
+        // Calcula el rango de tiles que el rectángulo podría tocar
+        int minCol = (int) (x / tileSize);
+        int maxCol = (int) ((x + width - 1) / tileSize);
+        int minRow = (int) (y / tileSize);
+        int maxRow = (int) ((y + height - 1) / tileSize);
+
+        // Se asegura de no salirse de los límites del mapa
+        minCol = Math.max(0, minCol);
+        maxCol = Math.min(tileMap[0].length - 1, maxCol);
+        minRow = Math.max(0, minRow);
+        maxRow = Math.min(tileMap.length - 1, maxRow);
 
         for (int i = minRow; i <= maxRow; i++) {
             for (int j = minCol; j <= maxCol; j++) {
-                if (tileMap[i][j] == Config.TILE_WALL || (tileMap[i][j] == Config.TILE_DOOR && !this.doorsAreOpen)) {
-                    Rectangle tileRect = new Rectangle(j * tileSize, i * tileSize, tileSize, tileSize);
-                    if (bounds.intersects(tileRect)) {
-                        return true; // Hay colisión
-                    }
+                int tileType = tileMap[i][j];
+                // Si el tile es una pared, o una puerta cerrada, hay colisión.
+                if (tileType == Config.TILE_WALL || (tileType == Config.TILE_DOOR && !this.doorsAreOpen)) {
+                    // Como los tiles son rectángulos alineados, si el bounding box del objeto
+                    // está en este tile, consideramos que hay una colisión potencial.
+                    // Para mayor precisión, podríamos verificar la intersección de rectángulos aquí,
+                    // pero para un juego basado en tiles esto es suficiente y más eficiente.
+                    return true;
                 }
             }
         }
-        return false; // No hubo colisión
+        return false;
     }
 
     public void openDoors() {
