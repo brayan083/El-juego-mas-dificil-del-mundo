@@ -3,8 +3,8 @@ package model;
 import java.awt.Rectangle;
 
 public class Key {
-    private float x, y;
-    private int width, height;
+    private final float x, y;
+    private final int width, height;
     private boolean collected;
 
     // --- ESTE ES EL CONSTRUCTOR ---

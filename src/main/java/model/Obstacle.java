@@ -7,11 +7,11 @@ import java.util.ArrayList;
 
 public class Obstacle {
     private float x, y; // Posición del centro del círculo
-    private int radius; // Radio del círculo
+    private final int radius; // Radio del círculo
     private float speed; // Velocidad (positiva o negativa)
-    private boolean isHorizontal; // True: mueve horizontal, False: mueve vertical
-    private int windowWidth, windowHeight; // Límites de la ventana
-    private List<Rectangle> customBounceBarriers;
+    private final boolean isHorizontal; // True: mueve horizontal, False: mueve vertical
+    private final int windowWidth, windowHeight; // Límites de la ventana
+    private final List<Rectangle> customBounceBarriers;
 
     // Constructor principal que incluye barreras de rebote personalizadas
     public Obstacle(float x, float y, int radius, float speed, boolean isHorizontal, int windowWidth,

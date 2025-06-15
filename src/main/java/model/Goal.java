@@ -2,8 +2,8 @@ package model;
 import java.awt.Rectangle;
 
 public class Goal {
-    private float x, y; // Posición de la meta
-    private int width, height; // Tamaño del rectángulo
+    private final float x, y; // Posición de la meta
+    private final int width, height; // Tamaño del rectángulo
 
     // Constructor
     public Goal(float x, float y, int width, int height) {

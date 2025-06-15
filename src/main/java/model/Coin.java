@@ -4,7 +4,7 @@ import java.awt.geom.Ellipse2D; // Podríamos usar círculos para las monedas
 
 public class Coin {
     private float x, y;
-    private int radius; // Usaremos radio para dibujar círculos
+    private final int radius; // Usaremos radio para dibujar círculos
     private boolean collected;
 
     public Coin(float x, float y, int radius) {

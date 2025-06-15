@@ -4,8 +4,8 @@ package model;
 
 public class Player {
     private float x, y; // Posición del cuadrado
-    private int size; // Tamaño (ancho y alto)
-    private float speed; // Velocidad de movimiento (píxeles por actualización)
+    private final int size; // Tamaño (ancho y alto)
+    private final float speed; // Velocidad de movimiento (píxeles por actualización)
     private boolean movingUp, movingDown, movingLeft, movingRight;
 
     // Constructor
