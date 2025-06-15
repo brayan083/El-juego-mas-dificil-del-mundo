@@ -7,6 +7,7 @@ import game.model.Key;
 import game.model.Level;
 import game.model.Player;
 import game.model.exception.LevelLoadException;
+import game.observer.UIUpdater;
 import game.utils.CollisionUtil;
 import game.view.GamePanel;
 
@@ -66,6 +67,11 @@ public class GameController {
         try {
             this.model = new GameModel();
             inputHandler.setActivePlayer(model.getPlayer());
+
+            // --- Observer ---
+            UIUpdater uiUpdater = new UIUpdater();
+            model.getSubject().addObserver(uiUpdater);
+
         } catch (LevelLoadException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error crítico al cargar niveles: " + e.getMessage(), "Error Crítico",
@@ -90,13 +96,12 @@ public class GameController {
         Player player = model.getPlayer();
         Level level = model.getCurrentLevel();
 
-        if (player == null || level == null)
-            return;
+        if (player == null || level == null) return;
 
         // Colisión con obstáculos
         for (game.model.Obstacle obstacle : level.getObstacles()) {
             if (CollisionUtil.intersects(player, obstacle)) {
-                model.resetPlayerPosition();
+                model.playerDied(); 
                 return; // Si el jugador muere, no necesitamos chequear más colisiones en este frame.
             }
         }
@@ -104,24 +109,25 @@ public class GameController {
         // Colisión con la llave
         Key key = level.getKey();
         if (key != null && !key.isCollected() && CollisionUtil.intersects(player, key)) {
-            key.setCollected(true);
+            model.collectKey(); 
             level.openDoors();
         }
 
         // Colisión con monedas
         for (game.model.Coin coin : level.getCoins()) {
             if (!coin.isCollected() && CollisionUtil.intersects(player, coin)) {
-                coin.setCollected(true);
+                model.collectCoin(coin);
             }
         }
 
         // Colisión con la meta
         if (CollisionUtil.intersects(player, level.getGoal())) {
             if (level.areAllCoinsCollectedInLevel()) {
-                model.incrementLevelIndex();
                 try {
-                    model.loadLevel(model.getCurrentLevelIndex());
-                    inputHandler.setActivePlayer(model.getPlayer());
+                    model.completeLevel();
+                    if(model.getPlayer() != null) {
+                        inputHandler.setActivePlayer(model.getPlayer());
+                    }
                 } catch (LevelLoadException e) {
                     model.setGameOver(true);
                 }
