@@ -1,15 +1,14 @@
-// Guardar como: src/main/java/controller/GameController.java
-package controller;
-
-import model.GameModel;
-import model.Level;
-import model.Player;
-import model.Key;
-import model.exception.LevelLoadException;
-import view.GamePanel;
-import handler.InputHandler;
+package game.controller;
 
 import javax.swing.JOptionPane;
+
+import game.model.GameModel;
+import game.model.Key;
+import game.model.Level;
+import game.model.Player;
+import game.model.exception.LevelLoadException;
+import game.utils.CollisionUtil;
+import game.view.GamePanel;
 
 public class GameController {
 
@@ -23,7 +22,7 @@ public class GameController {
     // 2. El constructor es PRIVADO.
     // Esto es fundamental, ya que impide que se puedan crear instancias
     // con 'new GameController()' desde fuera de esta clase.
-     private GameController() {
+    private GameController() {
         // Obtenemos la única instancia de InputHandler a través de su
         // "puerta de entrada" pública: el método getInstance().
         this.inputHandler = InputHandler.getInstance();
@@ -87,10 +86,6 @@ public class GameController {
         checkCollisions(); // 2. Revisa las colisiones
     }
 
-    // Aquí va toda la lógica de 'checkCollisions' que tenías en tu clase Game.java
-    // original.
-    // La diferencia es que ahora opera sobre 'model' en lugar de sobre sus propios
-    // atributos.
     private void checkCollisions() {
         Player player = model.getPlayer();
         Level level = model.getCurrentLevel();
@@ -99,7 +94,7 @@ public class GameController {
             return;
 
         // Colisión con obstáculos
-        for (model.Obstacle obstacle : level.getObstacles()) {
+        for (game.model.Obstacle obstacle : level.getObstacles()) {
             if (CollisionUtil.intersects(player, obstacle)) {
                 model.resetPlayerPosition();
                 return; // Si el jugador muere, no necesitamos chequear más colisiones en este frame.
@@ -114,10 +109,9 @@ public class GameController {
         }
 
         // Colisión con monedas
-        for (model.Coin coin : level.getCoins()) {
+        for (game.model.Coin coin : level.getCoins()) {
             if (!coin.isCollected() && CollisionUtil.intersects(player, coin)) {
                 coin.setCollected(true);
-                // Opcional: podrías querer un contador global de monedas en el modelo.
             }
         }
 

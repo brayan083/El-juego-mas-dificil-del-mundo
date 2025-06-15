@@ -1,6 +1,4 @@
-package model;
-
-// import java.awt.Rectangle;
+package game.model;
 
 public class Player {
     private float x, y; // Posición del cuadrado

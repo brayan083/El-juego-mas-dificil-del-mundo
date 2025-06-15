@@ -1,6 +1,6 @@
-package controller;
+package game.utils;
 
-import model.*; // Importa todas las clases del modelo
+import game.model.*;
 
 /**
  * Clase de utilidad con métodos estáticos para detectar colisiones

@@ -1,4 +1,4 @@
-package model;
+package game.model;
 import java.awt.Rectangle;
 
 public class Goal {

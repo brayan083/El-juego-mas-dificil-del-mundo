@@ -1,6 +1,4 @@
-package model.exception;
-
-// Puedes crear una nueva carpeta 'exception' dentro de 'model'
+package game.model.exception;
 
 public class LevelLoadException extends Exception {
     public LevelLoadException(String message) {

@@ -1,9 +1,9 @@
-// En: src/main/java/handler/InputHandler.java
-package handler;
+package game.controller;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import model.Player;
+
+import game.model.Player;
 
 public class InputHandler extends KeyAdapter {
 
@@ -22,7 +22,6 @@ public class InputHandler extends KeyAdapter {
     }
     // --- FIN: Implementación de Singleton ---
 
-
     private Player activePlayer;
 
     public void setActivePlayer(Player player) {
@@ -33,7 +32,6 @@ public class InputHandler extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
         if (activePlayer == null) return;
         
-        // La lógica de movimiento no cambia.
         int keyCode = e.getKeyCode();
         switch (keyCode) {
             case KeyEvent.VK_UP:    activePlayer.setMovingUp(true);    break;
@@ -47,7 +45,6 @@ public class InputHandler extends KeyAdapter {
     public void keyReleased(KeyEvent e) {
         if (activePlayer == null) return;
 
-        // La lógica de movimiento no cambia.
         int keyCode = e.getKeyCode();
         switch (keyCode) {
             case KeyEvent.VK_UP:    activePlayer.setMovingUp(false);   break;

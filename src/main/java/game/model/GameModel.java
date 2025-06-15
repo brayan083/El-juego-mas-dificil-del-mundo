@@ -1,7 +1,6 @@
-// src/main/java/model/GameModel.java
-package model;
+package game.model;
 
-import model.exception.LevelLoadException;
+import game.model.exception.LevelLoadException;
 
 public class GameModel {
 

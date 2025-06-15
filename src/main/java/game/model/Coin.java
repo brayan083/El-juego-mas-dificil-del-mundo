@@ -1,4 +1,4 @@
-package model;
+package game.model;
 
 import java.awt.geom.Ellipse2D; // Podríamos usar círculos para las monedas
 

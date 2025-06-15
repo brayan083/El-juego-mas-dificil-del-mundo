@@ -1,4 +1,4 @@
-package model;
+package game.model;
 
 import java.awt.Rectangle;
 
@@ -7,8 +7,6 @@ public class Key {
     private final int width, height;
     private boolean collected;
 
-    // --- ESTE ES EL CONSTRUCTOR ---
-    // Verifica que coincida: dos float y dos int.
     public Key(float x, float y, int width, int height) {
         this.x = x;
         this.y = y;

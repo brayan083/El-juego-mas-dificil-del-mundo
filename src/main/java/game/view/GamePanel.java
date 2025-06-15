@@ -1,12 +1,13 @@
 // src/main/java/view/GamePanel.java
-package view;
-
-import controller.GameController; // Importará el nuevo controlador
-import handler.InputHandler;
-import model.GameModel;
-import model.Config;
+package game.view;
 
 import javax.swing.JPanel;
+
+import game.controller.GameController;
+import game.controller.InputHandler;
+import game.model.Config;
+import game.model.GameModel;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,7 +24,6 @@ public class GamePanel extends JPanel {
         this.setPreferredSize(new Dimension(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT));
 
         setFocusable(true);
-        // Ahora obtenemos el KeyListener directamente del Singleton.
         addKeyListener(InputHandler.getInstance());
     }
 

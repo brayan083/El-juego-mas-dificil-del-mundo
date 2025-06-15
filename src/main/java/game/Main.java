@@ -1,11 +1,12 @@
+package game;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import controller.GameController;
-import model.Player;
-import view.GamePanel;
-import model.GameModel;
-import model.Level;
+import game.controller.GameController;
+import game.model.GameModel;
+import game.model.Level;
+import game.model.Player;
+import game.view.GamePanel;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,14 +20,9 @@ public class Main {
         javax.swing.SwingUtilities.invokeLater(() -> {
             try {
                 // 1. OBTENER EL CONTROLADOR (SINGLETON)
-                // En lugar de `new GameController()`, usamos `getInstance()` para obtener
-                // la única instancia permitida de nuestro controlador.
                 GameController controller = GameController.getInstance();
 
                 // 2. CREAR LA VISTA (EL PANEL DEL JUEGO)
-                // Creamos nuestro GamePanel, que es el JPanel donde se dibujará todo.
-                // Le pasamos el controlador para que sepa a quién notificar de los eventos
-                // (como las teclas).
                 GamePanel gamePanel = new GamePanel(controller);
 
                 // 3. CONECTAR LAS PIEZAS
@@ -35,14 +31,9 @@ public class Main {
                 controller.setView(gamePanel);
 
                 // 4. INICIALIZAR EL JUEGO
-                // Ahora que el controlador y la vista están conectados, le pedimos al
-                // controlador
-                // que cargue el modelo (el estado inicial del juego, el primer nivel, etc.).
-                // Si esto falla, el propio controlador se encargará de mostrar el error.
                 controller.initGame();
 
                 // 5. CONFIGURAR LA VENTANA PRINCIPAL (JFRAME)
-                // Esta parte es muy similar a la que ya tenías.
                 JFrame frame = new JFrame("World's Hardest Game");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setResizable(false);
@@ -51,8 +42,7 @@ public class Main {
                 frame.setLocationRelativeTo(null); // Centra la ventana.
                 frame.setVisible(true);
 
-                // Es crucial que el panel tenga el foco para poder escuchar los eventos del
-                // teclado.
+                // Es crucial que el panel tenga el foco para poder escuchar los eventos del teclado.
                 gamePanel.requestFocusInWindow();
 
                 // 6. INICIAR EL BUCLE DEL JUEGO (GAME LOOP)

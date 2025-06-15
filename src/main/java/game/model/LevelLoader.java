@@ -1,14 +1,15 @@
-package model;
+package game.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import game.model.exception.LevelLoadException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Rectangle;
-
-import model.exception.LevelLoadException; // Importa la nueva excepción
-import java.io.IOException; // Importa para ser más específico
+import java.io.IOException; 
 
 public class LevelLoader {
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -55,7 +56,6 @@ public class LevelLoader {
                     playerNode.get("size").intValue(),
                     playerNode.get("speed").floatValue()));
 
-            // ¡Añade esta parte!
             level.initialPlayerX = startX;
             level.initialPlayerY = startY;
             // System.out.println(playerNode);
