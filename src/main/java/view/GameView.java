@@ -1,11 +1,11 @@
 package view; // o com.tuproyecto.view si estás usando una estructura de paquetes más profunda
 
 import model.Config;
+import model.GameModel;
 import model.Level;
 import model.Player;
 import model.Obstacle;
 import model.Goal;
-import controller.Game; // Para acceder al estado del juego como deathCount, currentLevel, etc.
 
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -20,73 +20,63 @@ import model.Key;
 
 public class GameView {
 
-    public void renderGame(Graphics2D g2d, Game gameController, Level currentLevel, int totalLevels) {
-        // Dibujar el header
-        drawHeader(g2d, gameController, totalLevels, currentLevel);
+    // El método ahora recibe el GameModel, que contiene todo el estado del juego.
+    public void renderGame(Graphics2D g2d, GameModel model) {
+        Level currentLevel = model.getCurrentLevel(); // Obtenemos el nivel desde el modelo.
 
-        // Mover el área de juego hacia abajo para dejar espacio al header
+        // Dibujar el header, pasándole el modelo.
+        drawHeader(g2d, model);
+
         g2d.translate(0, Config.HEADER_HEIGHT);
 
-        // Pintar toda el área externa de color lavanda
         g2d.setColor(Config.COLOR_PLAY_AREA_BACKGROUND);
         g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT - Config.HEADER_HEIGHT);
 
-        if (gameController.isGameOver() && currentLevel == null) { // Caso de juego completado
-            // Restaurar la transformación antes de dibujar pantalla de game over que ocupa
+        // La lógica para game over ahora consulta directamente al modelo.
+        if (model.isGameOver() && currentLevel == null) {
             g2d.translate(0, -Config.HEADER_HEIGHT);
             drawGameOverScreen(g2d, "¡Juego Completado!");
         } else if (currentLevel != null) {
-            // Calcular el área jugable (rectángulo que encierra las paredes)
+            // El resto de la lógica de dibujado no cambia...
             Shape playArea = calculatePlayArea(currentLevel);
             if (playArea != null) {
                 Shape originalClip = g2d.getClip();
                 g2d.setClip(playArea);
-
-                // Dibujar el tablero de ajedrez dentro del área jugable
                 drawChessboardBackground(g2d, currentLevel);
                 g2d.setClip(originalClip);
             }
-
-            // Dibujar los componentes del nivel
             drawLevelComponents(g2d, currentLevel);
         }
-        // Si es gameOver por otra razón (ej. error de carga y currentLevel es el último
-        // válido)
-        // se podría mostrar otro mensaje o simplemente no dibujar nada más.
-
-        // Restaurar la transformación al final si es necesario (depende de cómo se
-        // estructure)
-        // Por ahora, Game.java se encargará de la transformación final en su
-        // paintComponent
-        // g2d.translate(0, -HEADER_HEIGHT); // Esta línea se maneja mejor en Game.java
-        // o al final de paintComponent
     }
 
-    private void drawHeader(Graphics2D g2d, Game gameController, int totalLevels, Level currentLevel) {
-        g2d.setColor(Config.COLOR_HEADER_BACKGROUND); //
-        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.HEADER_HEIGHT); //
+    // El header también recibe el GameModel para obtener los datos.
+    private void drawHeader(Graphics2D g2d, GameModel model) {
+        g2d.setColor(Config.COLOR_HEADER_BACKGROUND);
+        g2d.fillRect(0, 0, Config.WINDOW_WIDTH, Config.HEADER_HEIGHT);
 
-        g2d.setColor(Config.COLOR_HEADER_TEXT); //
-        g2d.setFont(new Font("Monospaced", Font.BOLD, 18)); //
+        g2d.setColor(Config.COLOR_HEADER_TEXT);
+        g2d.setFont(new Font("Monospaced", Font.BOLD, 18));
 
-        String levelText = "Nivel: " + (gameController.getCurrentLevelIndex() + 1) + "/" + totalLevels; //
-        g2d.drawString(levelText, 20, Config.HEADER_HEIGHT / 2 + 5); //
+        // Obtenemos los datos directamente del modelo.
+        String levelText = "Nivel: " + (model.getCurrentLevelIndex() + 1) + "/" + model.getTotalLevels();
+        g2d.drawString(levelText, 20, Config.HEADER_HEIGHT / 2 + 5);
 
-        String coinsText = "Monedas: 0/0"; // Texto por defecto si no hay nivel
+        String coinsText = "Monedas: 0/0";
+        Level currentLevel = model.getCurrentLevel();
         if (currentLevel != null) {
             int collectedInLevel = currentLevel.getNumberOfCurrentlyCollectedCoinsInLevel();
             int totalInLevel = currentLevel.getTotalCoinsInLevel();
             coinsText = "Monedas: " + collectedInLevel + "/" + totalInLevel;
         }
 
-        FontMetrics metrics = g2d.getFontMetrics(); //
+        FontMetrics metrics = g2d.getFontMetrics();
         int coinsTextWidth = metrics.stringWidth(coinsText);
-        // Posicionar el texto de monedas en el centro del header, por ejemplo
         g2d.drawString(coinsText, (Config.WINDOW_WIDTH - coinsTextWidth) / 2, Config.HEADER_HEIGHT / 2 + 5);
 
-        String deathsText = "Muertes: " + gameController.getDeathCount(); //
+        // Obtenemos el contador de muertes del modelo.
+        String deathsText = "Muertes: " + model.getDeathCount();
         int deathsTextWidth = metrics.stringWidth(deathsText);
-        g2d.drawString(deathsText, Config.WINDOW_WIDTH - deathsTextWidth - 20, Config.HEADER_HEIGHT / 2 + 5); //
+        g2d.drawString(deathsText, Config.WINDOW_WIDTH - deathsTextWidth - 20, Config.HEADER_HEIGHT / 2 + 5);
     }
 
     private Shape calculatePlayArea(Level level) {

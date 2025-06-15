@@ -1,76 +1,117 @@
 import javax.swing.JFrame;
-import controller.Game;
-import model.Config;
+import javax.swing.JOptionPane;
+
+import controller.GameController;
 import model.Player;
+import view.GamePanel;
+import model.GameModel;
 import model.Level;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
     public static void main(String[] args) {
         // runConsoleSimulation(); // Descomenta esto si quieres probar la simulación
+        
+        // Es una buena práctica ejecutar el código de la GUI de Swing en el
+        // Event Dispatch Thread (EDT) para evitar problemas de concurrencia.
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                // 1. OBTENER EL CONTROLADOR (SINGLETON)
+                // En lugar de `new GameController()`, usamos `getInstance()` para obtener
+                // la única instancia permitida de nuestro controlador.
+                GameController controller = GameController.getInstance();
 
-        // --- CÓDIGO CORREGIDO PARA LA GUI ---
-        // Ya no se necesita try-catch aquí, porque Game maneja sus propios errores.
-        JFrame frame = new JFrame("World's Hardest Game");
-        Game gameGUIPanel = new Game(); // Esta línea ya no da error.
+                // 2. CREAR LA VISTA (EL PANEL DEL JUEGO)
+                // Creamos nuestro GamePanel, que es el JPanel donde se dibujará todo.
+                // Le pasamos el controlador para que sepa a quién notificar de los eventos
+                // (como las teclas).
+                GamePanel gamePanel = new GamePanel(controller);
 
-        // Si la creación de Game fallara, el constructor de Game mostrará
-        // un JOptionPane y llamará a System.exit(1), por lo que el código
-        // siguiente no se ejecutaría en caso de error.
+                // 3. CONECTAR LAS PIEZAS
+                // El controlador necesita una referencia al panel para poder pedirle que se
+                // repinte (`repaint()`).
+                controller.setView(gamePanel);
 
-        gameGUIPanel.setBackground(Color.WHITE);
-        gameGUIPanel.setPreferredSize(new Dimension(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT)); //
-        frame.add(gameGUIPanel);
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        gameGUIPanel.requestFocusInWindow();
+                // 4. INICIALIZAR EL JUEGO
+                // Ahora que el controlador y la vista están conectados, le pedimos al
+                // controlador
+                // que cargue el modelo (el estado inicial del juego, el primer nivel, etc.).
+                // Si esto falla, el propio controlador se encargará de mostrar el error.
+                controller.initGame();
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                gameGUIPanel.update();
-                gameGUIPanel.repaint();
+                // 5. CONFIGURAR LA VENTANA PRINCIPAL (JFRAME)
+                // Esta parte es muy similar a la que ya tenías.
+                JFrame frame = new JFrame("World's Hardest Game");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setResizable(false);
+                frame.add(gamePanel); // Añadimos nuestro panel MVC-compatible.
+                frame.pack(); // Ajusta el tamaño de la ventana al del panel.
+                frame.setLocationRelativeTo(null); // Centra la ventana.
+                frame.setVisible(true);
+
+                // Es crucial que el panel tenga el foco para poder escuchar los eventos del
+                // teclado.
+                gamePanel.requestFocusInWindow();
+
+                // 6. INICIAR EL BUCLE DEL JUEGO (GAME LOOP)
+                Timer timer = new Timer();
+                timer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // El bucle ahora hace dos cosas:
+                        controller.update(); // 1. Actualiza el estado del juego.
+                        gamePanel.repaint(); // 2. Pide a la vista que se repinte.
+                    }
+                }, 0, 1000 / 60); // 60 FPS
+
+            } catch (Exception e) {
+                // Si algo catastrófico ocurre durante la inicialización, lo capturamos aquí.
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null,
+                        "Ocurrió un error fatal al iniciar el juego: " + e.getMessage(),
+                        "Error Crítico",
+                        JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
             }
-        }, 0, 1000 / 60); //
+        });
     }
 
     /**
-     * Esta simulación en consola carga el juego, mueve al jugador hacia una
-     * coordenada específica para recoger una moneda y luego intenta chocar
-     * con un obstáculo para simular una muerte. Imprime el estado en cada paso.
+     * Simulación en consola actualizada para la arquitectura MVC.
+     * Carga el juego, mueve al jugador y simula una muerte.
      */
     private static void runConsoleSimulation() {
-        System.out.println("--- Iniciando Mini Simulación en Consola ---");
+        System.out.println("--- Iniciando Simulación en Consola (MVC) ---");
 
-        Game gameSim = new Game();
+        // 1. Obtenemos la instancia del controlador. No hay vista (panel).
+        GameController controller = GameController.getInstance();
+        controller.initGame(); // Inicializamos el modelo del juego.
 
-        // Si el código llega aquí, el juego se cargó correctamente.
-        Player playerSim = null;
-        Level currentLevelSim = gameSim.getCurrentLevelData();
-
-        if (currentLevelSim != null) {
-            playerSim = currentLevelSim.getPlayer();
+        // 2. Obtenemos el modelo y el jugador a través del controlador.
+        GameModel modelSim = controller.getGameModel();
+        if (modelSim == null) {
+            System.out.println("Error: No se pudo inicializar el modelo del juego.");
+            return;
         }
+        Player playerSim = modelSim.getPlayer();
+        Level currentLevelSim = modelSim.getCurrentLevel();
 
-        if (playerSim == null) {
-            System.out.println("Error: No se pudo obtener el jugador para la simulación.");
-            System.out.println("--- Fin de la Mini Simulación en Consola ---");
+        if (playerSim == null || currentLevelSim == null) {
+            System.out.println("Error: No se pudo obtener el jugador o el nivel para la simulación.");
+            System.out.println("--- Fin de la Simulación ---");
             return;
         }
 
-        System.out.println("Nivel Inicial: " + (gameSim.getCurrentLevelIndex() + 1));
+        System.out.println("Nivel Inicial: " + (controller.getGameModel().getCurrentLevelIndex() + 1));
         System.out.println("Posición Inicial Jugador: (" + playerSim.getX() + ", " + playerSim.getY() + ")");
-        System.out.println("Monedas Recolectadas (Nivel): " + currentLevelSim.getNumberOfCurrentlyCollectedCoinsInLevel()
-                + "/" + currentLevelSim.getTotalCoinsInLevel());
-        System.out.println("Muertes: " + gameSim.getDeathCount());
+        System.out
+                .println("Monedas Recolectadas (Nivel): " + currentLevelSim.getNumberOfCurrentlyCollectedCoinsInLevel()
+                        + "/" + currentLevelSim.getTotalCoinsInLevel());
+        System.out.println("Muertes: " + controller.getGameModel().getDeathCount());
 
+        // La lógica de la simulación es la misma
         int targetX = 300;
         int targetY = 250;
         boolean monedaAlcanzada = false;
@@ -88,36 +129,36 @@ public class Main {
                     playerSim.setMovingUp(playerSim.getY() > targetY);
                 } else {
                     monedaAlcanzada = true;
-                    System.out.println("¡Moneda alcanzada!");
+                    System.out.println("¡Objetivo de coordenadas alcanzado!");
                 }
             } else {
-                // Una vez alcanzada la moneda, moverse hacia arriba para chocar.
+                // Moverse hacia arriba para chocar con un obstáculo.
                 playerSim.setMovingUp(true);
                 System.out.println("Acción: Jugador se mueve hacia arriba para buscar un obstáculo.");
             }
-            
-            // Actualizar el estado del juego (movimiento, colisiones, etc.)
-            gameSim.update();
 
-            // Imprimir estado actual
+            // 3. Llamamos al update del controlador para que corra la lógica del juego.
+            controller.update();
+
+            // Imprimir estado actual, obteniendo los datos desde el modelo.
             System.out.println("Posición Jugador: (" + playerSim.getX() + ", " + playerSim.getY() + ")");
             System.out.println(
                     "Monedas Recolectadas (Nivel): " + currentLevelSim.getNumberOfCurrentlyCollectedCoinsInLevel()
                             + "/" + currentLevelSim.getTotalCoinsInLevel());
-            System.out.println("Muertes: " + gameSim.getDeathCount());
+            System.out.println("Muertes: " + modelSim.getDeathCount());
 
-            if (gameSim.isGameOver()) {
+            if (modelSim.isGameOver()) {
                 System.out.println("¡GAME OVER durante la simulación!");
                 break;
             }
 
-            // Resetear flags de movimiento para el siguiente tick
+            // Resetear flags de movimiento para el siguiente tick.
             playerSim.setMovingRight(false);
             playerSim.setMovingLeft(false);
             playerSim.setMovingUp(false);
             playerSim.setMovingDown(false);
         }
 
-        System.out.println("\n--- Fin de la Mini Simulación en Consola ---");
+        System.out.println("\n--- Fin de la Simulación en Consola ---");
     }
 }
