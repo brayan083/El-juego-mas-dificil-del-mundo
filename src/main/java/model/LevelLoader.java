@@ -7,29 +7,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.Rectangle;
 
+import model.exception.LevelLoadException; // Importa la nueva excepción
+import java.io.IOException; // Importa para ser más específico
+
 public class LevelLoader {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static JsonNode rootNode = null; // Para cachear el JSON
 
     // Metodo privado para inicializar y obtener rootNode
-    private static JsonNode getRootNode() {
+    private static JsonNode getRootNode() throws LevelLoadException {
         if (rootNode == null) {
             try {
                 InputStream is = LevelLoader.class.getResourceAsStream("/levels.json");
+                if (is == null) {
+                    throw new LevelLoadException("El archivo 'levels.json' no se encontró en los recursos.");
+                }
                 rootNode = mapper.readTree(is);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.println("Error fatal: No se pudo cargar el archivo de niveles");
+            } catch (IOException e) {
+                throw new LevelLoadException("Error crítico al cargar 'levels.json'.", e);
             }
         }
         return rootNode;
     }
 
-    public static Level loadLevel(int levelIndex) {
+    public static Level loadLevel(int levelIndex) throws LevelLoadException {
         try {
-            JsonNode root = getRootNode();
+            JsonNode root = getRootNode(); // getRootNode también debe lanzar la excepción
             if (root == null || levelIndex >= root.get("levels").size() || levelIndex < 0) {
-                return null; // Devolver null si el índice no es válido
+                // Lanza una excepción en lugar de devolver null para un índice inválido
+                throw new LevelLoadException("Índice de nivel fuera de rango: " + levelIndex);
             }
 
             JsonNode levelNode = root.get("levels").get(levelIndex);
@@ -66,11 +72,10 @@ public class LevelLoader {
             if (levelNode.has("key")) {
                 JsonNode keyNode = levelNode.get("key");
                 level.setKey(new Key(
-                    keyNode.get("x").floatValue(),
-                    keyNode.get("y").floatValue(),
-                    keyNode.get("width").intValue(),
-                    keyNode.get("height").intValue()
-                ));
+                        keyNode.get("x").floatValue(),
+                        keyNode.get("y").floatValue(),
+                        keyNode.get("width").intValue(),
+                        keyNode.get("height").intValue()));
             }
 
             // Cargar obstáculos
@@ -127,9 +132,10 @@ public class LevelLoader {
             }
 
             return level;
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            // Error genérico para cualquier otro problema (ej. JSON mal formado)
+            throw new LevelLoadException("No se pudo parsear o cargar el nivel " + levelIndex, e);
         }
     }
 
@@ -147,16 +153,12 @@ public class LevelLoader {
         }
     }
 
-    public static int getTotalLevels() {
+    public static int getTotalLevels() throws LevelLoadException {
         try {
-            if (rootNode == null) {
-                InputStream is = LevelLoader.class.getResourceAsStream("/levels.json");
-                rootNode = mapper.readTree(is);
-            }
-            return rootNode.get("levels").size();
+            JsonNode root = getRootNode();
+            return root.get("levels").size();
         } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
+            throw new LevelLoadException("No se pudo determinar el número total de niveles.", e);
         }
     }
 }

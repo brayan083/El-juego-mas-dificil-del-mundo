@@ -1,11 +1,13 @@
 package controller;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import handler.InputHandler;
 import model.Level;
 import model.LevelLoader;
 import model.Player;
+import model.exception.LevelLoadException;
 import view.GameView;
 import model.Coin;
 
@@ -27,52 +29,59 @@ public class Game extends JPanel {
     private GameView gameView; // <-- NUEVA INSTANCIA
 
     public Game() {
+        // Estas operaciones son seguras.
         inputHandler = new InputHandler();
-        addKeyListener(inputHandler); // Registrar InputHandler como KeyListener
-        // Es crucial que loadLevel se llame DESPUÉS de inicializar inputHandler
-        // y que inputHandler.setActivePlayer se llame DESPUÉS de que el jugador del
-        // nivel esté disponible.
-        gameView = new GameView(); // <-- INICIALIZAR GameView
-        totalLevels = LevelLoader.getTotalLevels(); // Cargar una vez
-        loadLevel(currentLevelIndex);
-        gameOver = false;
-        setFocusable(true); // Asegúrate de que el JPanel pueda recibir foco para los eventos de teclado
+        gameView = new GameView(); // <-- Mover la inicialización aquí, antes del try-catch.
+
+        addKeyListener(inputHandler);
+        setFocusable(true); // Es bueno poner esto al principio también.
+
+        try {
+            totalLevels = LevelLoader.getTotalLevels();
+            loadLevel(currentLevelIndex);
+            gameOver = false;
+        } catch (LevelLoadException e) {
+            // Si la carga falla, el juego no puede empezar.
+            e.printStackTrace();
+
+            // El constructor mostrará un error y terminará la aplicación.
+            // GameView ya existe, por lo que no habrá un NullPointerException si
+            // el sistema intenta repintar antes de cerrar.
+            JOptionPane.showMessageDialog(null, "Error al cargar niveles: " + e.getMessage(), "Error Crítico",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
     }
 
     private void loadLevel(int levelIdx) {
-        Level newLevel = LevelLoader.loadLevel(levelIdx);
-        if (newLevel == null) {
-            // Si no se pudo cargar el siguiente nivel (ej. llegamos al final o error)
-            if (levelIdx >= totalLevels && totalLevels > 0) { // Asumimos que se completaron todos los niveles
-                gameOver = true;
-                this.level = null; // No hay nivel actual si el juego está completado
-                currentLevelIndex = totalLevels; // Para mostrar N/N o similar
-                if (inputHandler != null) {
-                    inputHandler.setActivePlayer(null);
-                }
-            } else { // Error cargando un nivel que debería existir, o no hay niveles.
-                System.err.println("Error al cargar el nivel: " + levelIdx + ". O no hay más niveles.");
-                // Mantener el último nivel válido o manejar como juego terminado
-                // Si es el primer nivel y falla, es un problema mayor.
-                // Por ahora, si falla y no es el final, mantenemos el anterior
-                if (this.level != null) { // Si ya había un nivel cargado
-                    currentLevelIndex--; // Revertir al índice anterior si es posible
-                } else { // No hay ningún nivel cargado y el primero falla
-                    gameOver = true; // No se puede continuar
-                }
-                if (inputHandler != null) {
-                    inputHandler.setActivePlayer(null);
-                }
+        try {
+            Level newLevel = LevelLoader.loadLevel(levelIdx);
+
+            // Esta sección se ejecuta solo si la carga fue exitosa
+            this.level = newLevel;
+            this.currentLevelIndex = levelIdx;
+            gameOver = false;
+            if (inputHandler != null && this.level.getPlayer() != null) {
+                inputHandler.setActivePlayer(this.level.getPlayer());
             }
-            return;
-        }
-        this.level = newLevel;
-        this.currentLevelIndex = levelIdx; // Actualizar el índice
-        gameOver = false;
-        if (inputHandler != null && this.level.getPlayer() != null) {
-            inputHandler.setActivePlayer(this.level.getPlayer());
-        } else if (inputHandler != null) {
-            inputHandler.setActivePlayer(null);
+
+        } catch (LevelLoadException e) {
+            // Maneja el caso en que se intenta cargar un nivel que no existe (ej. al
+            // terminar el juego)
+            if (levelIdx >= totalLevels && totalLevels > 0) {
+                gameOver = true;
+                this.level = null;
+                currentLevelIndex = totalLevels;
+                if (inputHandler != null) {
+                    inputHandler.setActivePlayer(null);
+                }
+            } else {
+                // Un error inesperado cargando un nivel que debería existir
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al cargar el nivel: " + e.getMessage(), "Error de Carga",
+                        JOptionPane.WARNING_MESSAGE);
+                gameOver = true; // No se puede continuar
+            }
         }
     }
 
