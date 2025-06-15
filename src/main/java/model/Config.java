@@ -38,4 +38,9 @@ public class Config {
     // Otros tamaños constantes que podrían ser útiles
     public static final int CHESSBOARD_TILE_SIZE = 30;
 
+    // Magic Numbers 
+    public static final int TILE_GROUND = 0;
+    public static final int TILE_WALL = 1;
+    public static final int TILE_DOOR = 2;
+
 }

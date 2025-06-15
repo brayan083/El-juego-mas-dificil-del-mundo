@@ -1,9 +1,12 @@
 package model;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Level {
     private Player player; // Jugador
+    public float initialPlayerX;
+    public float initialPlayerY;
     private ArrayList<Obstacle> obstacles; // Lista de obstáculos
     private Goal goal; // Meta
     private ArrayList<Coin> coins;
@@ -91,6 +94,32 @@ public class Level {
         this.doorsAreOpen = false;
     }
 
+    /**
+     * Verifica si un área rectangular colisiona con una pared o una puerta cerrada.
+     * @param bounds El área a verificar.
+     * @return true si hay colisión, false en caso contrario.
+     */
+    public boolean isCollidingWithWall(Rectangle bounds) {
+        if (tileMap == null) return false;
+
+        int minRow = Math.max(0, bounds.y / tileSize);
+        int maxRow = Math.min(tileMap.length - 1, (bounds.y + bounds.height - 1) / tileSize);
+        int minCol = Math.max(0, bounds.x / tileSize);
+        int maxCol = Math.min(tileMap[0].length - 1, (bounds.x + bounds.width - 1) / tileSize);
+
+        for (int i = minRow; i <= maxRow; i++) {
+            for (int j = minCol; j <= maxCol; j++) {
+                if (tileMap[i][j] == Config.TILE_WALL || (tileMap[i][j] == Config.TILE_DOOR && !this.doorsAreOpen)) {
+                    Rectangle tileRect = new Rectangle(j * tileSize, i * tileSize, tileSize, tileSize);
+                    if (bounds.intersects(tileRect)) {
+                        return true; // Hay colisión
+                    }
+                }
+            }
+        }
+        return false; // No hubo colisión
+    }
+
     public void openDoors() {
         this.doorsAreOpen = true;
     }
@@ -108,6 +137,8 @@ public class Level {
     public int getTileSize() { return tileSize; }
     public int getWindowWidth() { return windowWidth; }
     public int getWindowHeight() { return windowHeight; }
+    public float getInitialPlayerX() { return initialPlayerX; }
+    public float getInitialPlayerY() { return initialPlayerY; }
 
     // Setters 
     public void setPlayer(Player player) { this.player = player; }

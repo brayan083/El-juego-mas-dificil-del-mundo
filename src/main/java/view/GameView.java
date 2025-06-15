@@ -150,13 +150,13 @@ public class GameView {
 
             for (int i = 0; i < tileMap.length; i++) {
                 for (int j = 0; j < tileMap[i].length; j++) {
-                    if (tileMap[i][j] == 1) { // Pared
+                    if (tileMap[i][j] == Config.TILE_WALL) { // Pared
                         g2d.setColor(Config.COLOR_WALL_TILE);
                         g2d.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
 
                         // ---- ESTA LÍNEA ES LA CLAVE DEL DIBUJADO ----
                         // Solo dibuja la puerta (2) si las puertas están CERRADAS (!doorsOpen)
-                    } else if (tileMap[i][j] == 2 && !doorsOpen) {
+                    } else if (tileMap[i][j] == Config.TILE_DOOR && !doorsOpen) {
                         g2d.setColor(Config.COLOR_SAFE_ZONE_TILE);
                         g2d.fillRect(j * tileSize, i * tileSize, tileSize, tileSize);
                     }

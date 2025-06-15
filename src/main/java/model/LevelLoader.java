@@ -38,13 +38,20 @@ public class LevelLoader {
             Level level = new Level(Config.WINDOW_WIDTH, Config.WINDOW_HEIGHT);
 
             // Cargar jugador
+            // Dentro de loadLevel()
             JsonNode playerNode = levelNode.get("player");
+            float startX = playerNode.get("x").floatValue();
+            float startY = playerNode.get("y").floatValue();
+
             level.setPlayer(new Player(
-                    playerNode.get("x").floatValue(),
-                    playerNode.get("y").floatValue(),
+                    startX,
+                    startY,
                     playerNode.get("size").intValue(),
                     playerNode.get("speed").floatValue()));
 
+            // ¡Añade esta parte!
+            level.initialPlayerX = startX;
+            level.initialPlayerY = startY;
             // System.out.println(playerNode);
 
             // Cargar meta

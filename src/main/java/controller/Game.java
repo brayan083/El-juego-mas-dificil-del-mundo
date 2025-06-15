@@ -2,8 +2,6 @@ package controller;
 
 import javax.swing.JPanel;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import handler.InputHandler;
 import model.Level;
 import model.LevelLoader;
@@ -155,17 +153,10 @@ public class Game extends JPanel {
     private void resetPlayerPosition() {
         deathCount++;
         if (level != null) {
-            level.resetCoinsInLevel();
-        }
-        Player player = level.getPlayer();
-        JsonNode levelData = LevelLoader.getLevelData(currentLevelIndex); // Usar currentLevelIndex
-        if (levelData != null) {
-            JsonNode playerNode = levelData.get("player");
-            if (playerNode != null) { // Chequeo adicional
-                int x = (int) playerNode.get("x").floatValue();
-                int y = (int) playerNode.get("y").floatValue();
-                player.setPosition(x, y);
-            }
+            level.resetCoinsInLevel(); // Esto ya lo tenías y está bien
+            Player player = level.getPlayer();
+            // Simplemente resetea la posición desde el nivel
+            player.setPosition(level.getInitialPlayerX(), level.getInitialPlayerY());
         }
     }
 
