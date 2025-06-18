@@ -79,6 +79,13 @@ public class ConsoleView {
         clearConsole();
         System.out.println("--- World's Hardest Game (Consola) ---");
         System.out.println("Nivel: " + (model.getCurrentLevelIndex() + 1) + " | Muertes: " + model.getDeathCount());
+
+        if (model.isGameOver()) {
+            System.out.println("\n--- Top 10 Jugadores ---");
+            for (int i = 0; i < model.getTopTen().size(); i++) {
+                System.out.println((i + 1) + ". " + model.getTopTen().get(i));
+            }
+        }
         
         for (int i = 0; i < consoleRows; i++) {
             for (int j = 0; j < consoleCols; j++) {

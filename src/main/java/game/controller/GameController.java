@@ -65,13 +65,27 @@ public class GameController {
      */
     public void initGame() {
         try {
-            this.model = new GameModel();
-            inputHandler.setActivePlayer(model.getPlayer());
+            if (model == null) { // Solo crea una nueva instancia si no existe
+                this.model = new GameModel();
+                inputHandler.setActivePlayer(model.getPlayer());
 
-            // --- Observer ---
-            UIUpdater uiUpdater = new UIUpdater();
-            model.getSubject().addObserver(uiUpdater);
-
+                UIUpdater uiUpdater = new UIUpdater();
+                model.getSubject().addObserver(uiUpdater);
+            } else {
+                model.setGameOver(false); // Reinicia el estado de fin de juego
+                model.incrementLevelIndex(); // Asegura que comience desde el nivel 0
+                model.loadLevel(0); // Fuerza la recarga del primer nivel
+                if (model.getCurrentLevel() == null) {
+                    throw new LevelLoadException("No se pudo cargar el nivel inicial.");
+                }
+                model.getCurrentLevel().resetCoinsInLevel(); // Reinicia monedas
+                model.setDeathCount(0); // Reinicia contador de muertes para nueva partida
+                Player player = model.getPlayer();
+                if (player != null) {
+                    player.setPosition(model.getCurrentLevel().getInitialPlayerX(), model.getCurrentLevel().getInitialPlayerY());
+                }
+                inputHandler.setActivePlayer(model.getPlayer());
+            }
         } catch (LevelLoadException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error crítico al cargar niveles: " + e.getMessage(), "Error Crítico",
@@ -132,6 +146,18 @@ public class GameController {
                     model.setGameOver(true);
                 }
             }
+        }
+    }
+
+    public void endGame(String playerName) {
+        if (model.isGameOver()) { // Solo guarda el nombre si el juego ya terminó
+            if (playerName == null || playerName.trim().isEmpty()) {
+                playerName = JOptionPane.showInputDialog("¡Juego completado! Ingresa tu nombre para el top 10:");
+                if (playerName == null || playerName.trim().isEmpty()) {
+                    playerName = "Jugador Anónimo";
+                }
+            }
+            model.addToTopTen(playerName); // Agrega el nombre al top 10
         }
     }
 
