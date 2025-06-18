@@ -2,7 +2,10 @@ package game.model;
 
 import game.model.exception.LevelLoadException;
 import game.observer.EventType; 
-import game.observer.Subject;   
+import game.observer.Subject;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class GameModel {
 
@@ -12,7 +15,7 @@ public class GameModel {
     private int deathCount;
     private final int totalLevels; // final, se carga una vez
     private final Subject subject = new Subject(); // Instancia del Sujeto
-
+    private ArrayList<Score> topTen = new ArrayList<>();
 
     public GameModel() throws LevelLoadException {
         this.currentLevelIndex = 0;
@@ -94,6 +97,21 @@ public class GameModel {
         }
     }
 
+    public void addToTopTen(String playerName) {
+        topTen.add(new Score(playerName, deathCount)); // Agrega nuevo puntaje
+        Collections.sort(topTen); // Ordena de menor a mayor (menos muertes primero)
+        if (topTen.size() > 10) {
+            topTen.subList(10, topTen.size()).clear(); // Limita a los 10 mejores
+        }
+    }
+
+    public ArrayList<Score> getTopTen() {
+        return topTen;
+    }
+
+    public void setDeathCount(int deathCount) {
+        this.deathCount = deathCount; // Permite reiniciar el contador de muertes
+    }
 
     // --- Getters y Setters para que el Controller los use ---
     public Level getCurrentLevel() { return currentLevel; }

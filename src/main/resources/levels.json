@@ -10,7 +10,7 @@
         { "x": 495, "y": 350, "radius": 9, "speed": 3, "horizontal": false },
         { "x": 525, "y": 190, "radius": 9, "speed": 3, "horizontal": false },
         { "x": 555, "y": 190, "radius": 9, "speed": 3, "horizontal": false }],
-      "coins": [                                 
+      "coins": [
         { "x": 480, "y": 240, "radius": 8 },
         { "x": 420, "y": 300, "radius": 8 },
         { "x": 540, "y": 300, "radius": 8 }
@@ -47,7 +47,7 @@
         { "x": 650, "y": 285, "radius": 9, "speed": 4, "horizontal": true },
         { "x": 650, "y": 315, "radius": 9, "speed": 4, "horizontal": true }
       ],
-      "coins": [                                  
+      "coins": [
         { "x": 450, "y": 300, "radius": 8 },
         { "x": 450, "y": 240, "radius": 8 }
       ],
@@ -78,33 +78,33 @@
       "player": { "x": 260, "y": 250, "size": 23, "speed": 2.3 },
       "goal": { "x": 240, "y": 240, "width": 60, "height": 60 },
       "obstacles": [
-        { "x": 315, "y": 255, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 315, "y": 255, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 305, "y": 255, "width": 1, "height": 1 },
             { "x": 500, "y": 255, "width": 1, "height": 1 }
-          ] 
+          ]
         },
-        { "x": 315, "y": 285, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 315, "y": 285, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 305, "y": 285, "width": 1, "height": 1 },
             { "x": 500, "y": 285, "width": 1, "height": 1 }
-          ] 
+          ]
         },
-        { "x": 525, "y": 255, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 525, "y": 255, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 515, "y": 255, "width": 1, "height": 1 },
             { "x": 710, "y": 255, "width": 1, "height": 1 }
-          ] 
+          ]
         },
-        { "x": 525, "y": 285, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 525, "y": 285, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 515, "y": 285, "width": 1, "height": 1 },
             { "x": 710, "y": 285, "width": 1, "height": 1 }
-          ] 
+          ]
         }
       ],
       "coins": [
-        { "x": 750, "y": 270, "radius": 8 }                                  
+        { "x": 750, "y": 270, "radius": 8 }
       ],
       "tileMap": [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -132,35 +132,35 @@
       "player": { "x": 160, "y": 120, "size": 23, "speed": 2 },
       "goal": { "x": 450, "y": 390, "width": 90, "height": 60 },
       "obstacles": [
-        { "x": 140, "y": 165, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 140, "y": 165, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 480, "y": 165, "width": 1, "height": 1 }
-          ] 
+          ]
         },
-        { "x": 470, "y": 195, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 470, "y": 195, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 480, "y": 195, "width": 1, "height": 1 }
-          ] 
+          ]
         },
-        { "x": 140, "y": 225, "radius": 9, "speed": 2.75, "horizontal": true, 
-        "customBounceBarriers": [
-          { "x": 480, "y": 225, "width": 1, "height": 1 }
-        ] 
-        },
-        { "x": 470, "y": 315, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 140, "y": 225, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 480, "y": 225, "width": 1, "height": 1 }
-          ] 
+          ]
         },
-        { "x": 140, "y": 345, "radius": 9, "speed": 2.75, "horizontal": true, 
-        "customBounceBarriers": [
-          { "x": 480, "y": 225, "width": 1, "height": 1 }
-        ] 
-        },
-        { "x": 470, "y": 375, "radius": 9, "speed": 2.75, "horizontal": true, 
+        { "x": 470, "y": 315, "radius": 9, "speed": 2.75, "horizontal": true,
           "customBounceBarriers": [
             { "x": 480, "y": 225, "width": 1, "height": 1 }
-          ] 
+          ]
+        },
+        { "x": 140, "y": 345, "radius": 9, "speed": 2.75, "horizontal": true,
+          "customBounceBarriers": [
+            { "x": 480, "y": 225, "width": 1, "height": 1 }
+          ]
+        },
+        { "x": 470, "y": 375, "radius": 9, "speed": 2.75, "horizontal": true,
+          "customBounceBarriers": [
+            { "x": 480, "y": 225, "width": 1, "height": 1 }
+          ]
         },
         { "x": 225, "y": 160, "radius": 9, "speed": 1.5, "horizontal": false},
         { "x": 255, "y": 160, "radius": 9, "speed": 1.5, "horizontal": false},
@@ -171,12 +171,12 @@
         { "x": 435, "y": 380, "radius": 9, "speed": 1.5, "horizontal": false,
           "customBounceBarriers": [
             { "x": 435, "y": 390, "width": 1, "height": 1 }
-          ] 
+          ]
         },
         { "x": 465, "y": 380, "radius": 9, "speed": 1.5, "horizontal": false,
           "customBounceBarriers": [
             { "x": 465, "y": 390, "width": 1, "height": 1 }
-          ] 
+          ]
         }
       ],
       "key": { "x": 510, "y": 195, "width": 12, "height": 22 },

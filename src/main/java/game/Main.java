@@ -15,20 +15,31 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Main {
+    private static boolean isGameFinished = false; // Bandera para indicar fin del juego gráfico
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String choice;
 
         while (true) { // Bucle infinito hasta que el usuario elija salir
+            isGameFinished = false; // Reinicia la bandera
             choice = displayMainMenu(scanner); // Llama al nuevo método del menú
 
             switch (choice) {
                 case "1":
                     runGraphicalGame();
+                    while (!isGameFinished) {
+                        try {
+                            Thread.sleep(100); // Pequeña pausa para no saturar el CPU
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            System.out.println("Interrupción detectada: " + e.getMessage());
+                        }
+                    }
                     // Nota: El programa terminará cuando se cierre la ventana de Swing.
-                    return; // Salir del método main
+                    break; // Vuelve al menú después de que termine el juego gráfico
                 case "2":
-                    runInteractiveConsoleGame();
+                    runInteractiveConsoleGame(scanner);
                     break; // Vuelve al menú después de que termine el juego de consola
                 case "3":
                     runConsoleSimulation();
@@ -36,6 +47,26 @@ public class Main {
                     scanner.nextLine(); // Espera a que el usuario presione Enter
                     break; // Vuelve al menú después de la simulación
                 case "4":
+                    GameController controllerStats = GameController.getInstance();
+                    GameModel modelStats = controllerStats.getGameModel();
+                    if (modelStats != null) {
+                        System.out.println("\n--- Estadísticas - Top 10 ---");
+                        java.util.ArrayList<game.model.Score> topTen = modelStats.getTopTen();
+                        if (topTen.isEmpty()) {
+                            System.out.println("No hay registros en el top 10 aún.");
+                        } else {
+                            for (int i = 0; i < Math.min(topTen.size(), 10); i++) {
+                                System.out.println((i + 1) + ". " + topTen.get(i));
+                            }
+                        }
+                    } else {
+                        System.out.println("\n--- Estadísticas - Top 10 ---");
+                        System.out.println("No se ha iniciado ningún juego aún.");
+                    }
+                    System.out.println("Presiona Enter para continuar...");
+                    scanner.nextLine();
+                    break;
+                case "5":
                     System.out.println("¡Gracias por jugar! Adiós.");
                     scanner.close();
                     return; // Termina la aplicación
@@ -69,7 +100,7 @@ public class Main {
 
                 // 5. CONFIGURAR LA VENTANA PRINCIPAL (JFRAME)
                 JFrame frame = new JFrame("World's Hardest Game");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Cambiado a DISPOSE para no salir
                 frame.setResizable(false);
                 frame.add(gamePanel); // Añadimos nuestro panel MVC-compatible.
                 frame.pack(); // Ajusta el tamaño de la ventana al del panel.
@@ -85,12 +116,23 @@ public class Main {
                 timer.scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
-                        // El bucle ahora hace dos cosas:
+                        // El bucle ahora hace tres cosas:
                         controller.update(); // 1. Actualiza el estado del juego.
                         gamePanel.repaint(); // 2. Pide a la vista que se repinte.
-                    }
-                }, 0, 1000 / 60); // 60 FPS
 
+                        if (controller.getGameModel().isGameOver()) { // 3. Comprueba si el juego ha terminado.
+                            String playerName = JOptionPane.showInputDialog("¡Juego completado! Ingresa tu nombre para el top 10:");
+                            if (playerName == null || playerName.trim().isEmpty()) {
+                                playerName = "Jugador Anónimo";
+                            }
+                            controller.endGame(playerName); // Guarda el nombre del jugador en el top 10.
+                            timer.cancel(); // Detiene el Timer
+                            frame.dispose(); // Cierra la ventana pero no el programa
+                            System.out.println("Volviendo al menú...");
+                            isGameFinished = true; // Marca el fin del juego;
+                        }
+                    }
+                }, 0, 1000 / 60);
             } catch (Exception e) {
                 // Si algo catastrófico ocurre durante la inicialización, lo capturamos aquí.
                 e.printStackTrace();
@@ -106,65 +148,72 @@ public class Main {
     /**
      * Nuevo método para correr el juego de forma interactiva en la consola.
      */
-    private static void runInteractiveConsoleGame() {
+    private static void runInteractiveConsoleGame(Scanner scanner) {
         GameController controller = GameController.getInstance();
         controller.initGame();
 
         GameModel model = controller.getGameModel();
         ConsoleView consoleView = new ConsoleView();
-        try (Scanner scanner = new Scanner(System.in)) {
+        // Bucle de juego principal y de un solo hilo
+        while (!model.isGameOver()) {
+            consoleView.render(model); // Dibuja el estado actual
 
-            // Bucle de juego principal y de un solo hilo
-            while (!model.isGameOver()) {
-                consoleView.render(model); // Dibuja el estado actual
-
-                Level currentLevel = model.getCurrentLevel();
-                if (currentLevel == null) {
-                    break; // El juego ha terminado
-                }
-
-                System.out.print("Comando (w,a,s,d) y Enter (q para salir): ");
-                String input = scanner.nextLine().trim().toLowerCase();
-
-                if (input.isEmpty()) {
-                    continue;
-                }
-                char command = input.charAt(0);
-
-                if (command == 'q') {
-                    break;
-                }
-
-                Player player = model.getPlayer();
-                float currentX = player.getX();
-                float currentY = player.getY();
-                int stepSize = currentLevel.getTileSize(); // Nos moveremos una celda entera
-
-                // Modificamos directamente la posición del jugador
-                switch (command) {
-                    case 'w':
-                        player.setPosition(currentX, currentY - stepSize);
-                        break;
-                    case 's':
-                        player.setPosition(currentX, currentY + stepSize);
-                        break;
-                    case 'a':
-                        player.setPosition(currentX - stepSize, currentY);
-                        break;
-                    case 'd':
-                        player.setPosition(currentX + stepSize, currentY);
-                        break;
-                }
-
-                // Después de mover al jugador, llamamos a update() una vez.
-                // Esto hará que los obstáculos se muevan un paso y que se
-                // comprueben TODAS las colisiones en la nueva posición.
-                controller.update();
+            Level currentLevel = model.getCurrentLevel();
+            if (currentLevel == null) {
+                model.setGameOver(true); // Fuerza el fin del juego si el nivel es null
+                break; // El juego ha terminado
             }
 
-            System.out.println("¡Juego Terminado!");
+            System.out.print("Comando (w,a,s,d) y Enter (q para salir): ");
+            String input = scanner.nextLine().trim().toLowerCase();
+
+            if (input.isEmpty()) {
+                continue;
+            }
+            char command = input.charAt(0);
+
+            if (command == 'q') {
+                model.setGameOver(true); // Marca el juego como terminado al salir con 'q'
+                break;
+            }
+
+            Player player = model.getPlayer();
+            float currentX = player.getX();
+            float currentY = player.getY();
+            int stepSize = currentLevel.getTileSize(); // Nos moveremos una celda entera
+
+            // Modificamos directamente la posición del jugador
+            switch (command) {
+                case 'w':
+                    player.setPosition(currentX, currentY - stepSize);
+                    break;
+                case 's':
+                    player.setPosition(currentX, currentY + stepSize);
+                    break;
+                case 'a':
+                    player.setPosition(currentX - stepSize, currentY);
+                    break;
+                case 'd':
+                    player.setPosition(currentX + stepSize, currentY);
+                    break;
+            }
+
+            // Después de mover al jugador, llamamos a update() una vez.
+            // Esto hará que los obstáculos se muevan un paso y que se
+            // comprueben TODAS las colisiones en la nueva posición.
+            controller.update();
+            }
+
+            System.out.print("¡Juego Terminado! Ingresa tu nombre para el top 10: ");
+            String playerName = scanner.nextLine().trim();
+            if (playerName.isEmpty()) {
+                playerName = "Jugador Anónimo";
+            }
+            controller.endGame(playerName);
             System.out.println("Muertes totales: " + model.getDeathCount());
-        }
+            System.out.println("Presiona Enter para volver al menú...");
+            scanner.nextLine(); // Espera para regresar al menú
+
     }
 
     /**
@@ -277,7 +326,8 @@ public class Main {
         System.out.println("  1. Jugar (Interfaz Gráfica)");
         System.out.println("  2. Jugar (Consola Interactiva)");
         System.out.println("  3. Simulación (Consola)");
-        System.out.println("  4. Salir");
+        System.out.println("  4. Estadísticas");
+        System.out.println("  5. Salir");
         System.out.println("-----------------------------------------------------------");
         System.out.print("Por favor, elige una opción: ");
 
